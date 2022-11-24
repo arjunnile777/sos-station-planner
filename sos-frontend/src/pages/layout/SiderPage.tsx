@@ -9,6 +9,8 @@ import {
   FileAddOutlined,
   UserAddOutlined,
 } from '@ant-design/icons';
+import { CUSTOMER_MASTER_ROUTE, KEY_CUSTOMER_MASTER } from '../../constants';
+import { useNavigate } from 'react-router-dom';
 
 const { Sider } = Layout;
 type MenuItem = Required<MenuProps>['items'][number];
@@ -29,7 +31,7 @@ function getItem(
 
 const items: MenuItem[] = [
   getItem('Master', 'master', <UserAddOutlined />, [
-    getItem('Customer Master', 'customer_master', <UserOutlined />),
+    getItem('Customer Master', KEY_CUSTOMER_MASTER, <UserOutlined />),
     getItem('Part Master', 'part_master', <UserOutlined />),
     getItem('Customer Part Linkage', 'customer_part_linkage', <UserOutlined />),
     getItem('Station Master', 'station_master', <UserOutlined />),
@@ -46,6 +48,17 @@ type SiderPageType = {
 };
 
 const SiderPage = ({ collapsed = false, onCollapsed }: SiderPageType) => {
+  const navigate = useNavigate();
+  const onSelectMenu = (selectedMenu: any) => {
+    switch (selectedMenu.key) {
+      case KEY_CUSTOMER_MASTER:
+        navigate(`/${CUSTOMER_MASTER_ROUTE}`);
+        break;
+      default:
+        navigate(`/`);
+    }
+  };
+
   return (
     <Sider
       width={200}
@@ -70,6 +83,7 @@ const SiderPage = ({ collapsed = false, onCollapsed }: SiderPageType) => {
           defaultSelectedKeys={['1']}
           mode="inline"
           items={items}
+          onClick={onSelectMenu}
         />
       </div>
 
