@@ -9,7 +9,24 @@ import {
   FileAddOutlined,
   UserAddOutlined,
 } from '@ant-design/icons';
-import { CUSTOMER_MASTER_ROUTE, KEY_CUSTOMER_MASTER } from '../../constants';
+import {
+  CLIENT_ROUTE,
+  CUSTOMER_MASTER_ROUTE,
+  CUSTOMER_PART_LINKAGE_ROUTE,
+  EMPLOYEE_MASTER_ROUTE,
+  KEY_CLIENT,
+  KEY_CUSTOMER_MASTER,
+  KEY_CUSTOMER_PART_LINKAGE,
+  KEY_EMPLOYEE_MASTER,
+  KEY_PART_MASTER,
+  KEY_PLANNING,
+  KEY_REPORTS,
+  KEY_STATION_MASTER,
+  PART_MASTER_ROUTE,
+  PLANNING_ROUTE,
+  REPORTS_ROUTE,
+  STATION_MASTER_ROUTE,
+} from '../../constants';
 import { useNavigate } from 'react-router-dom';
 
 const { Sider } = Layout;
@@ -32,14 +49,18 @@ function getItem(
 const items: MenuItem[] = [
   getItem('Master', 'master', <UserAddOutlined />, [
     getItem('Customer Master', KEY_CUSTOMER_MASTER, <UserOutlined />),
-    getItem('Part Master', 'part_master', <UserOutlined />),
-    getItem('Customer Part Linkage', 'customer_part_linkage', <UserOutlined />),
-    getItem('Station Master', 'station_master', <UserOutlined />),
-    getItem('Employee Master', 'employee_master', <UserOutlined />),
+    getItem('Part Master', KEY_PART_MASTER, <UserOutlined />),
+    getItem(
+      'Customer Part Linkage',
+      KEY_CUSTOMER_PART_LINKAGE,
+      <UserOutlined />,
+    ),
+    getItem('Station Master', KEY_STATION_MASTER, <UserOutlined />),
+    getItem('Employee Master', KEY_EMPLOYEE_MASTER, <UserOutlined />),
   ]),
-  getItem('Planning', 'planning', <LaptopOutlined />),
-  getItem('Client', 'client', <UserOutlined />),
-  getItem('Reports', 'reports', <FileAddOutlined />),
+  getItem('Planning', KEY_PLANNING, <LaptopOutlined />),
+  getItem('Client', KEY_CLIENT, <UserOutlined />),
+  getItem('Reports', KEY_REPORTS, <FileAddOutlined />),
 ];
 
 type SiderPageType = {
@@ -53,6 +74,27 @@ const SiderPage = ({ collapsed = false, onCollapsed }: SiderPageType) => {
     switch (selectedMenu.key) {
       case KEY_CUSTOMER_MASTER:
         navigate(`/${CUSTOMER_MASTER_ROUTE}`);
+        break;
+      case KEY_PART_MASTER:
+        navigate(`/${PART_MASTER_ROUTE}`);
+        break;
+      case KEY_CUSTOMER_PART_LINKAGE:
+        navigate(`/${CUSTOMER_PART_LINKAGE_ROUTE}`);
+        break;
+      case KEY_STATION_MASTER:
+        navigate(`/${STATION_MASTER_ROUTE}`);
+        break;
+      case KEY_EMPLOYEE_MASTER:
+        navigate(`/${EMPLOYEE_MASTER_ROUTE}`);
+        break;
+      case KEY_PLANNING:
+        navigate(`/${PLANNING_ROUTE}`);
+        break;
+      case KEY_CLIENT:
+        navigate(`/${CLIENT_ROUTE}`);
+        break;
+      case KEY_REPORTS:
+        navigate(`/${REPORTS_ROUTE}`);
         break;
       default:
         navigate(`/`);

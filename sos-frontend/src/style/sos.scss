@@ -14,7 +14,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #fff;
+    background-color: $white-color;
     position: fixed;
     top: 0;
     right: 0;
@@ -146,4 +146,153 @@
 .sos-contents-collapsed-root {
     width: calc(100% - $collapsed-sideBar-width);
     margin-left: $collapsed-sideBar-width;
+}
+
+.sos-ant-table {
+    .ant-table-thead {
+        tr {
+            th {
+                background: $table-header-color;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .ant-table-filter-column {
+        .ant-table-filter-trigger {
+            .anticon-search {
+                svg {
+                    color: $white-color;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+            }
+        }
+        .ant-table-filter-trigger.active {
+            .anticon-search {
+                svg {
+                    color: $active-text;
+                }
+            }
+        }
+    }
+}
+
+.sos-ellipsis-icon-cs {
+    opacity: 0.5;
+
+    .ant-badge-status-dot {
+        background: $success-color;
+    }
+    .ant-badge-status {
+        margin-left: 4px;
+    }
+}
+
+.sos-ellipsis-dropdown-cs {
+    .ant-dropdown-menu-item {
+        padding: 9px 17px 7px 19px;
+    }
+
+    .ant-switch-small {
+        margin-left: 10px;
+    }
+    .ant-switch-checked {
+        background-color: $success-color;
+    }
+}
+
+.sos-input-cs {
+    .ant-input {
+        background: $input-bgcolor;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: $sos-text-color;
+    }
+    .ant-input:focus {
+        box-shadow: 0 0 0 2px $input-shadow-color;
+    }
+    .input-label {
+        letter-spacing: 0.33px;
+        color: $input-label-color;
+        text-transform: uppercase;
+        font-size: 11px;
+        margin-bottom: 5px;
+
+        .input-required-label {
+            letter-spacing: 0.033rem;
+            color: #f5222d;
+            margin-left: 5px;
+            font-weight: 200;
+            font-size: 12px;
+        }
+    }
+}
+.sos-textarea-cs {
+    .ant-input {
+        background: $input-bgcolor;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: $sos-text-color;
+    }
+    .ant-input:focus {
+        box-shadow: 0 0 0 2px $input-shadow-color;
+    }
+    .input-label {
+        letter-spacing: 0.33px;
+        color: $input-label-color;
+        text-transform: uppercase;
+        font-size: 11px;
+        margin-bottom: 5px;
+
+        .input-required-label {
+            letter-spacing: 0.033rem;
+            color: #f5222d;
+            margin-left: 5px;
+            font-weight: 200;
+            font-size: 12px;
+        }
+    }
+}
+
+.sos-switch-cs {
+    .sos-switch-label {
+        letter-spacing: 0.33px;
+        color: $input-label-color;
+        text-transform: uppercase;
+        font-size: 11px;
+        margin-bottom: 5px;
+    }
+
+    .ant-switch-checked {
+        background-color: $success-color;
+    }
+}
+
+.sos-form-root-cs {
+    .sos-input-cs {
+        margin-bottom: 12px;
+    }
+    .sos-textarea-cs {
+        margin-bottom: 12px;
+    }
+}
+
+.sos-error-line {
+    font-size: 11px;
+    color: $error-color;
+}
+
+.custom-spinner-cs {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgb(0 0 0 / 30%);
+    left: 0;
+    top: 0;
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }
