@@ -26,7 +26,7 @@ http.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     // const accessToken = getAccessToken();
     const accessToken =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imd1ZXN0IiwidXNlcklkIjoiZDA2NmQwYzQtNDcwZS00Y2ZjLWJjM2UtNjYxM2Y4MDFlZWNmIiwiaWF0IjoxNjY5NDAyNzM3LCJleHAiOjE2NzAwMDc1Mzd9.nvoVoIL9D_cEIgYN669Kcga8KzxF1UWUWLxu4EmpZBA';
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imd1ZXN0IiwidXNlcklkIjoiZDA2NmQwYzQtNDcwZS00Y2ZjLWJjM2UtNjYxM2Y4MDFlZWNmIiwiaWF0IjoxNjY5NzE0MTUxLCJleHAiOjE2NzAzMTg5NTF9.FWtxBheoY9H78mJoQ1dsoDBrOS2orp7uMMCtfTfSbZA';
     return assignTokenToHeader(config, accessToken);
   },
   error => {

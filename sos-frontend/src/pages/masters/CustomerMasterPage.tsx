@@ -13,6 +13,17 @@ import {
   getAllCustomerMasters,
 } from '../../store/slices/customerMaster.slice';
 import CustomSpinner from '../../component/CustomSpinner';
+import {
+  CreateCustomerMasterType,
+  DeleteCustomerMasterType,
+} from '../../types/customerMaster/CustomerMasterPayloadType';
+import {
+  deleteCustomerMasterApi,
+  updateCustomerMasteriApi,
+} from '../../services/CustomerMasterApi';
+import { PopupMessagePage } from '../../component/PopupMessagePage';
+import SosConfirmModal from '../../component/SosConfirmModal';
+import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
 
 interface CustomerMasterPageType {
   id: number;
@@ -45,6 +56,8 @@ const CustomerMasterPage = () => {
     phone: '',
     contact_person: '',
   });
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [selectedItemToDelete, setSelectedItemToDelete] = useState<any>();
 
   // When component render below code has called and fetch  GET ALL customer masters api.
   useEffect(() => {
@@ -203,7 +216,10 @@ const CustomerMasterPage = () => {
               editLabel="Edit Customer"
               item={record}
               handleEditUser={() => onHandleEditUser(record)}
-              handleUpdateStatus={onHandleUpdateStatus}
+              handleUpdateStatus={status =>
+                onHandleUpdateStatus(status, record)
+              }
+              handleRemove={() => onHandleRemove(record)}
             />
           </div>
         </>
@@ -216,6 +232,7 @@ const CustomerMasterPage = () => {
   ];
 
   const onChangePagination = (pageInfo: any, filters: any) => {
+    console.log(pageInfo);
     console.log(filters);
     setCurrentPage(pageInfo.current);
     setCurrentPageSize(pageInfo.pageSize);
@@ -236,8 +253,75 @@ const CustomerMasterPage = () => {
     setIsAddCustomerOpen(true);
   };
 
-  const onHandleUpdateStatus = () => {
-    console.log('Handle on update status');
+  const onHandleUpdateStatus = async (status: boolean, record: any) => {
+    const params: CreateCustomerMasterType = {
+      id: record.id,
+      name: record.name,
+      code: record.code,
+      contact_person: record.contact_person,
+      address: record.address,
+      phone: record.phone,
+      status: status ? 1 : 0,
+    };
+
+    try {
+      setIsSpinning(true);
+      const response = await updateCustomerMasteriApi(params);
+      if (response && response.data) {
+        handleSuccessResponse(response.data);
+      }
+    } catch (e) {
+      setIsSpinning(false);
+    }
+  };
+
+  const handleSuccessResponse = (successResponse: any) => {
+    if (successResponse) {
+      PopupMessagePage({
+        title: successResponse.message,
+        type: 'success',
+      });
+      dispatch(getAllCustomerMasters());
+    } else {
+      PopupMessagePage({
+        title: successResponse.message,
+        type: 'warning',
+      });
+    }
+    setIsSpinning(false);
+  };
+
+  const onHandleRemove = (record: any) => {
+    setDeleteModalVisible(true);
+    setSelectedItemToDelete(record);
+  };
+
+  const onConfirm = (confirm: boolean) => {
+    if (confirm && selectedItemToDelete) deleteSelectedItem();
+    else setDeleteModalVisible(false);
+  };
+
+  const deleteSelectedItem = async () => {
+    const params: DeleteCustomerMasterType = {
+      id: selectedItemToDelete.id,
+      markDelete: 1,
+    };
+    try {
+      setIsSpinning(true);
+      const response = await deleteCustomerMasterApi(params);
+      if (response && response.data) {
+        PopupMessagePage({
+          title: response.data.data,
+          type: 'success',
+        });
+        setIsSpinning(false);
+        setDeleteModalVisible(false);
+        setSelectedItemToDelete(null);
+        dispatch(getAllCustomerMasters());
+      }
+    } catch (e) {
+      setIsSpinning(false);
+    }
   };
 
   const onApplyFilters = (filters: any, page?: number, page_size?: number) => {
@@ -276,6 +360,7 @@ const CustomerMasterPage = () => {
               pageSize: currentPageSize,
             }}
             onChange={onChangePagination}
+            scroll={TABLE_MAX_HEIGHT_OBJECT}
           />
         </Col>
       </Row>
@@ -294,6 +379,14 @@ const CustomerMasterPage = () => {
       )}
 
       {isSpinning ? <CustomSpinner /> : ''}
+      {deleteModalVisible && (
+        <SosConfirmModal
+          visible={deleteModalVisible}
+          title="Remove Customer Master"
+          bodyText={`Are you sure you want to delete ${selectedItemToDelete.name}`}
+          onConfirm={onConfirm}
+        />
+      )}
     </>
   );
 };

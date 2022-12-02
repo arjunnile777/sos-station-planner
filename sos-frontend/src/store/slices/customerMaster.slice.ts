@@ -15,7 +15,7 @@ export const getAllCustomerMasters: any = createAsyncThunk(
   'customerMaster/getAllCustomerMasters',
   async (payload?: CustomerMastersAllType) => {
     const response = await getAllCustomerMasterApi(payload);
-    return response.data.data;
+    return response.data;
   },
 );
 
@@ -34,8 +34,8 @@ export const CustomerMasterSlice = createSlice({
       getAllCustomerMasters.fulfilled,
       (state: CustomerMasterState, { payload }) => {
         state.isCustomerMasterLoading = false;
-        state.customerMasterData = payload;
-        state.totalCustomerMaster = payload.length;
+        state.customerMasterData = payload.data;
+        state.totalCustomerMaster = payload.total_count;
       },
     );
     builder.addCase(

@@ -1,5 +1,6 @@
 import {
   CreatePartMasterType,
+  DeletePartMasterType,
   PartMastersAllType,
 } from '../types/partMaster/partMasterPayloadType';
 import { http } from './api';
@@ -13,5 +14,5 @@ export const addPartMasteriApi = (payload: CreatePartMasterType) =>
 export const updatePartMasteriApi = (payload: CreatePartMasterType) =>
   http.put(`/part/update/${payload.id}`, payload);
 
-// export const deleteHolidayApi = (payload: CreatePartMasterType) =>
-//   http.post(`/delete-holiday/${payload.id}`);
+export const deletePartMasterApi = (payload: DeletePartMasterType) =>
+  http.put(`/part/temp-delete/${payload.id}`);

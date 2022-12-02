@@ -1,16 +1,16 @@
-export type StationMastersAllType = {
+export type ClientAllType = {
   page?: number;
   page_size?: number;
   station_name?: string;
 };
 
-export type CreateStationMasterType = {
+export type CreateClientType = {
   id?: number;
   station_name: string;
   status: number;
 };
 
-export type DeleteStationMasterType = {
+export type DeleteClientType = {
   id: number;
   markDelete: number;
 };

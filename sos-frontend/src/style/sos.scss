@@ -154,6 +154,7 @@
             th {
                 background: $table-header-color;
                 font-weight: bold;
+                color: $white-color;
             }
         }
     }
@@ -202,6 +203,51 @@
     }
 }
 
+.sos-select-cs {
+    .ant-select {
+        width: 100%;
+    }
+
+    .ant-select:not(.ant-select-customize-input) .ant-select-selector,
+    .ant-select-selector {
+        background-color: #1951900f;
+        border: 1px solid #1951900f;
+        height: 42px;
+        border-radius: 8px;
+        padding: 5px 15px;
+
+        .ant-select-selection-item {
+            font-size: 15px;
+            color: #2c2c2c;
+            font-weight: 600;
+        }
+        .ant-select-selection-search {
+            margin: 3px;
+        }
+    }
+
+    .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+        border-color: #1951900f;
+        border-right-width: 2px;
+    }
+
+    .select-label {
+        letter-spacing: 0.33px;
+        color: #4b4b4b;
+        text-transform: uppercase;
+        font-size: 11px;
+        margin-bottom: 5px;
+
+        .select-required-label {
+            letter-spacing: 0.033rem;
+            color: #f5222d;
+            margin-left: 5px;
+            font-weight: 200;
+            font-size: 12px;
+        }
+    }
+}
+
 .sos-input-cs {
     .ant-input {
         background: $input-bgcolor;
@@ -229,6 +275,7 @@
         }
     }
 }
+
 .sos-textarea-cs {
     .ant-input {
         background: $input-bgcolor;
@@ -272,6 +319,9 @@
 }
 
 .sos-form-root-cs {
+    .sos-select-cs {
+        margin-bottom: 12px;
+    }
     .sos-input-cs {
         margin-bottom: 12px;
     }
@@ -295,4 +345,37 @@
     align-items: center;
     justify-content: center;
     display: flex;
+}
+
+.ant-modal-content {
+    border-radius: 20px;
+    .ant-modal-header {
+        border-radius: 19px 19px 0 0;
+        background: $table-header-color;
+        .ant-modal-close {
+            color: $white-color;
+            font-weight: bold;
+            .ant-modal-close-x {
+                .ant-modal-close-icon {
+                    svg {
+                        color: $white-color;
+                    }
+                }
+            }
+        }
+        .ant-modal-title {
+            color: $white-color;
+            font-weight: bold;
+
+            svg {
+                color: $white-color;
+            }
+        }
+    }
+}
+
+.scanner-fields-cs {
+    padding-bottom: 100px;
+    padding-left: 100px;
+    padding-right: 100px;
 }

@@ -22,19 +22,17 @@ type AddEmployeeMasterPageType = {
 
 type InputFieldsType = {
   nameValue: string;
-  codeValue: string;
-  addressValue: string;
-  contactPersonValue: string;
-  phoneNumberValue: string;
+  eidValue: string;
+  roleValue: number;
+  passwordValue: string;
   statusValue: boolean;
 };
 
 type InputErrorFieldsType = {
   nameValueError: string;
-  codeValueError: string;
-  addressValueError: string;
-  contactPersonValueError: string;
-  phoneNumberValueError: string;
+  eidValueError: string;
+  roleValueError: string;
+  passwordValueError: string;
 };
 
 const AddEmployeeMasterPage = ({
@@ -47,32 +45,27 @@ const AddEmployeeMasterPage = ({
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [inputFieldsValues, setInputFieldsValues] = useState<InputFieldsType>({
     nameValue: '',
-    codeValue: '',
-    addressValue: '',
-    contactPersonValue: '',
-    phoneNumberValue: '',
+    eidValue: '',
+    roleValue: 0,
+    passwordValue: '',
     statusValue: true,
   });
 
   const [inputErrorFieldsValues, setInputErrorFieldsValues] =
     useState<InputErrorFieldsType>({
       nameValueError: '',
-      codeValueError: '',
-      addressValueError: '',
-      contactPersonValueError: '',
-      phoneNumberValueError: '',
+      eidValueError: '',
+      roleValueError: '',
+      passwordValueError: '',
     });
 
   useEffect(() => {
-    console.log('updateModalData==', updateModalData);
-    console.log(isUpdateModal);
     if (isUpdateModal && updateModalData) {
       const fields = {
         nameValue: updateModalData.name,
-        codeValue: updateModalData.code,
-        addressValue: updateModalData.address,
-        contactPersonValue: updateModalData.contact_person,
-        phoneNumberValue: updateModalData.phone,
+        eidValue: updateModalData.eid,
+        roleValue: updateModalData.role,
+        passwordValue: updateModalData.password,
         statusValue: updateModalData.status === 1 ? true : false,
       };
       setInputFieldsValues(fields);
@@ -102,17 +95,15 @@ const AddEmployeeMasterPage = ({
     console.log('Entered all values=', inputFieldsValues);
     if (
       inputFieldsValues.nameValue &&
-      inputFieldsValues.codeValue &&
-      inputFieldsValues.contactPersonValue &&
-      inputFieldsValues.addressValue &&
-      inputFieldsValues.phoneNumberValue
+      inputFieldsValues.eidValue &&
+      inputFieldsValues.roleValue &&
+      inputFieldsValues.passwordValue
     ) {
       const params: CreateEmployeeMasterType = {
         name: inputFieldsValues.nameValue,
-        code: inputFieldsValues.codeValue,
-        contact_person: inputFieldsValues.contactPersonValue,
-        address: inputFieldsValues.addressValue,
-        phone: inputFieldsValues.phoneNumberValue,
+        eid: inputFieldsValues.eidValue,
+        role: inputFieldsValues.roleValue,
+        password: inputFieldsValues.passwordValue,
         status: inputFieldsValues.statusValue ? 1 : 0,
       };
       if (isUpdateModal) {
@@ -127,17 +118,14 @@ const AddEmployeeMasterPage = ({
       if (!inputFieldsValues.nameValue)
         fieldsObj.nameValueError = 'Name is required field';
 
-      if (!inputFieldsValues.codeValue)
-        fieldsObj.codeValueError = 'Code is required field';
+      if (!inputFieldsValues.eidValue)
+        fieldsObj.eidValueError = 'Employee Id is required field';
 
-      if (!inputFieldsValues.contactPersonValue)
-        fieldsObj.contactPersonValueError = 'Contact person is required field';
+      if (!inputFieldsValues.roleValue)
+        fieldsObj.roleValueError = 'Role is required field';
 
-      if (!inputFieldsValues.addressValue)
-        fieldsObj.addressValueError = 'Address is required field';
-
-      if (!inputFieldsValues.phoneNumberValue)
-        fieldsObj.phoneNumberValueError = 'Phone Number is required field';
+      if (!inputFieldsValues.passwordValue)
+        fieldsObj.passwordValueError = 'Password is required field';
 
       setInputErrorFieldsValues({
         ...fieldsObj,
@@ -192,19 +180,17 @@ const AddEmployeeMasterPage = ({
   const resetData = () => {
     const fieldsClear = {
       nameValue: '',
-      codeValue: '',
-      addressValue: '',
-      contactPersonValue: '',
-      phoneNumberValue: '',
+      eidValue: '',
+      roleValue: 0,
+      passwordValue: '',
       statusValue: false,
     };
 
     const fieldsError = {
       nameValueError: '',
-      codeValueError: '',
-      addressValueError: '',
-      contactPersonValueError: '',
-      phoneNumberValueError: '',
+      eidValueError: '',
+      roleValueError: '',
+      passwordValueError: '',
     };
 
     setInputFieldsValues(fieldsClear);
@@ -231,35 +217,28 @@ const AddEmployeeMasterPage = ({
             required
           />
           <SosInputComponentType
-            label="Code"
+            label="Employee ID"
             required
-            value={inputFieldsValues.codeValue}
-            error={inputErrorFieldsValues.codeValueError}
-            name="codeValue"
+            value={inputFieldsValues.eidValue}
+            error={inputErrorFieldsValues.eidValueError}
+            name="eidValue"
             onChange={onChangeInputChange}
           />
-          <SosTextAreaComponent
-            label="Address"
+
+          <SosInputComponentType
+            label="Employee Role"
             required
-            value={inputFieldsValues.addressValue}
-            error={inputErrorFieldsValues.addressValueError}
-            name="addressValue"
+            value={inputFieldsValues.roleValue}
+            error={inputErrorFieldsValues.roleValueError}
+            name="roleValue"
             onChange={onChangeInputChange}
           />
           <SosInputComponentType
-            label="Contact Person"
+            label="Password"
             required
-            value={inputFieldsValues.contactPersonValue}
-            error={inputErrorFieldsValues.contactPersonValueError}
-            name="contactPersonValue"
-            onChange={onChangeInputChange}
-          />
-          <SosInputComponentType
-            label="Phone Number"
-            required
-            value={inputFieldsValues.phoneNumberValue}
-            error={inputErrorFieldsValues.phoneNumberValueError}
-            name="phoneNumberValue"
+            value={inputFieldsValues.passwordValue}
+            error={inputErrorFieldsValues.passwordValueError}
+            name="passwordValue"
             onChange={onChangeInputChange}
           />
           <Space className="sos-switch-cs">

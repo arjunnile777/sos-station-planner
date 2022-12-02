@@ -3,7 +3,6 @@ import { Col, Modal, Row, Space, Switch } from 'antd';
 import { useDispatch } from 'react-redux';
 
 import SosInputComponentType from '../../component/SosInputComponent';
-import SosTextAreaComponent from '../../component/SosTextareaComponent';
 import CustomSpinner from '../../component/CustomSpinner';
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import { CreateStationMasterType } from '../../types/stationMaster/stationMasterPayloadType';
@@ -22,19 +21,11 @@ type AddStationMasterPageType = {
 
 type InputFieldsType = {
   nameValue: string;
-  codeValue: string;
-  addressValue: string;
-  contactPersonValue: string;
-  phoneNumberValue: string;
   statusValue: boolean;
 };
 
 type InputErrorFieldsType = {
   nameValueError: string;
-  codeValueError: string;
-  addressValueError: string;
-  contactPersonValueError: string;
-  phoneNumberValueError: string;
 };
 
 const AddStationMasterPage = ({
@@ -47,20 +38,12 @@ const AddStationMasterPage = ({
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [inputFieldsValues, setInputFieldsValues] = useState<InputFieldsType>({
     nameValue: '',
-    codeValue: '',
-    addressValue: '',
-    contactPersonValue: '',
-    phoneNumberValue: '',
     statusValue: true,
   });
 
   const [inputErrorFieldsValues, setInputErrorFieldsValues] =
     useState<InputErrorFieldsType>({
       nameValueError: '',
-      codeValueError: '',
-      addressValueError: '',
-      contactPersonValueError: '',
-      phoneNumberValueError: '',
     });
 
   useEffect(() => {
@@ -68,11 +51,7 @@ const AddStationMasterPage = ({
     console.log(isUpdateModal);
     if (isUpdateModal && updateModalData) {
       const fields = {
-        nameValue: updateModalData.name,
-        codeValue: updateModalData.code,
-        addressValue: updateModalData.address,
-        contactPersonValue: updateModalData.contact_person,
-        phoneNumberValue: updateModalData.phone,
+        nameValue: updateModalData.station_name,
         statusValue: updateModalData.status === 1 ? true : false,
       };
       setInputFieldsValues(fields);
@@ -100,19 +79,9 @@ const AddStationMasterPage = ({
 
   const handleSubmit = () => {
     console.log('Entered all values=', inputFieldsValues);
-    if (
-      inputFieldsValues.nameValue &&
-      inputFieldsValues.codeValue &&
-      inputFieldsValues.contactPersonValue &&
-      inputFieldsValues.addressValue &&
-      inputFieldsValues.phoneNumberValue
-    ) {
+    if (inputFieldsValues.nameValue) {
       const params: CreateStationMasterType = {
-        name: inputFieldsValues.nameValue,
-        code: inputFieldsValues.codeValue,
-        contact_person: inputFieldsValues.contactPersonValue,
-        address: inputFieldsValues.addressValue,
-        phone: inputFieldsValues.phoneNumberValue,
+        station_name: inputFieldsValues.nameValue,
         status: inputFieldsValues.statusValue ? 1 : 0,
       };
       if (isUpdateModal) {
@@ -126,18 +95,6 @@ const AddStationMasterPage = ({
 
       if (!inputFieldsValues.nameValue)
         fieldsObj.nameValueError = 'Name is required field';
-
-      if (!inputFieldsValues.codeValue)
-        fieldsObj.codeValueError = 'Code is required field';
-
-      if (!inputFieldsValues.contactPersonValue)
-        fieldsObj.contactPersonValueError = 'Contact person is required field';
-
-      if (!inputFieldsValues.addressValue)
-        fieldsObj.addressValueError = 'Address is required field';
-
-      if (!inputFieldsValues.phoneNumberValue)
-        fieldsObj.phoneNumberValueError = 'Phone Number is required field';
 
       setInputErrorFieldsValues({
         ...fieldsObj,
@@ -228,38 +185,7 @@ const AddStationMasterPage = ({
             onChange={onChangeInputChange}
             required
           />
-          <SosInputComponentType
-            label="Code"
-            required
-            value={inputFieldsValues.codeValue}
-            error={inputErrorFieldsValues.codeValueError}
-            name="codeValue"
-            onChange={onChangeInputChange}
-          />
-          <SosTextAreaComponent
-            label="Address"
-            required
-            value={inputFieldsValues.addressValue}
-            error={inputErrorFieldsValues.addressValueError}
-            name="addressValue"
-            onChange={onChangeInputChange}
-          />
-          <SosInputComponentType
-            label="Contact Person"
-            required
-            value={inputFieldsValues.contactPersonValue}
-            error={inputErrorFieldsValues.contactPersonValueError}
-            name="contactPersonValue"
-            onChange={onChangeInputChange}
-          />
-          <SosInputComponentType
-            label="Phone Number"
-            required
-            value={inputFieldsValues.phoneNumberValue}
-            error={inputErrorFieldsValues.phoneNumberValueError}
-            name="phoneNumberValue"
-            onChange={onChangeInputChange}
-          />
+
           <Space className="sos-switch-cs">
             <span className="sos-switch-label">Station Status : </span>
             <Switch

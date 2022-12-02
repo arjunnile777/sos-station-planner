@@ -14,7 +14,7 @@ export const getAllEmployeeMasters: any = createAsyncThunk(
   'employeeMaster/getAllEmployeeMasters',
   async (payload?: EmployeeMastersAllType) => {
     const response = await getAllEmployeeMasterApi(payload);
-    return response.data.data;
+    return response.data;
   },
 );
 
@@ -33,8 +33,8 @@ export const EmployeeMasterSlice = createSlice({
       getAllEmployeeMasters.fulfilled,
       (state: EmployeeMasterState, { payload }) => {
         state.isEmployeeMasterLoading = false;
-        state.employeeMasterData = payload;
-        state.totalEmployeeMaster = payload.length;
+        state.employeeMasterData = payload.data;
+        state.totalEmployeeMaster = payload.total_count;
       },
     );
     builder.addCase(

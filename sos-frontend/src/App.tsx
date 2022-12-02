@@ -18,6 +18,10 @@ import {
 } from './constants';
 import PartMasterPage from './pages/masters/PartMasterPage';
 import StationMasterPage from './pages/masters/StationMasterPage';
+import CustomerPartLinkagePage from './pages/masters/CustomerPartLinkagePage';
+import EmployeeMasterPage from './pages/masters/EmployeeMasterPage';
+import PlanningPage from './pages/planning/PlanningPage';
+import ClientPage from './pages/client/ClientPage';
 
 const App = () => {
   return (
@@ -32,15 +36,15 @@ const App = () => {
           <Route path={PART_MASTER_ROUTE} element={<PartMasterPage />} />
           <Route
             path={CUSTOMER_PART_LINKAGE_ROUTE}
-            element={<CustomerMasterPage />}
+            element={<CustomerPartLinkagePage />}
           />
           <Route path={STATION_MASTER_ROUTE} element={<StationMasterPage />} />
           <Route
             path={EMPLOYEE_MASTER_ROUTE}
-            element={<CustomerMasterPage />}
+            element={<EmployeeMasterPage />}
           />
-          <Route path={PLANNING_ROUTE} element={<CustomerMasterPage />} />
-          <Route path={CLIENT_ROUTE} element={<CustomerMasterPage />} />
+          <Route path={PLANNING_ROUTE} element={<PlanningPage />} />
+          <Route path={CLIENT_ROUTE} element={<ClientPage />} />
           <Route path={REPORTS_ROUTE} element={<CustomerMasterPage />} />
         </Route>
       </Routes>

@@ -1,5 +1,6 @@
 import {
   CreateStationMasterType,
+  DeleteStationMasterType,
   StationMastersAllType,
 } from '../types/stationMaster/stationMasterPayloadType';
 import { http } from './api';
@@ -13,5 +14,5 @@ export const addStationMasteriApi = (payload: CreateStationMasterType) =>
 export const updateStationMasteriApi = (payload: CreateStationMasterType) =>
   http.put(`/station/update/${payload.id}`, payload);
 
-// export const deleteHolidayApi = (payload: CreatePartMasterType) =>
-//   http.post(`/delete-holiday/${payload.id}`);
+export const deleteStationMasterApi = (payload: DeleteStationMasterType) =>
+  http.put(`/station/temp-delete/${payload.id}`);

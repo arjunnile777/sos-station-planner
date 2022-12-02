@@ -15,3 +15,8 @@ export type CreateCustomerMasterType = {
   status: number;
   address: string;
 };
+
+export type DeleteCustomerMasterType = {
+  id: number;
+  markDelete: number;
+};

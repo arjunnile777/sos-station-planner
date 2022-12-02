@@ -1,17 +1,18 @@
 export type PartMastersAllType = {
   page?: number;
   page_size?: number;
-  name?: string;
-  phone?: string;
-  contact_person?: string;
+  part_no?: string;
 };
 
 export type CreatePartMasterType = {
   id?: number;
-  name: string;
-  code: string;
-  contact_person: string;
-  phone: number | string;
+  part_no: string;
+  part_description: string;
+  uom: string;
   status: number;
-  address: string;
+};
+
+export type DeletePartMasterType = {
+  id: number;
+  markDelete: number;
 };

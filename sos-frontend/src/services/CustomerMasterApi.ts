@@ -1,6 +1,7 @@
 import {
   CreateCustomerMasterType,
   CustomerMastersAllType,
+  DeleteCustomerMasterType,
 } from '../types/customerMaster/CustomerMasterPayloadType';
 import { http } from './api';
 
@@ -13,5 +14,5 @@ export const addCustomerMasteriApi = (payload: CreateCustomerMasterType) =>
 export const updateCustomerMasteriApi = (payload: CreateCustomerMasterType) =>
   http.put(`/customer/update/${payload.id}`, payload);
 
-// export const deleteHolidayApi = (payload: CreateCustomerMasterType) =>
-//   http.post(`/delete-holiday/${payload.id}`);
+export const deleteCustomerMasterApi = (payload: DeleteCustomerMasterType) =>
+  http.put(`/customer/temp-delete/${payload.id}`);

@@ -9,84 +9,89 @@ import moment from 'moment';
 import SosEllipsisDropdown from '../../component/SosEllipsisDropdown';
 import CustomSpinner from '../../component/CustomSpinner';
 import {
-  EmployeeMasterSliceSelector,
-  getAllEmployeeMasters,
-} from '../../store/slices/employeeMaster.slice';
-import AddEmployeeMasterPage from './AddEmployeeMasterPage';
+  CustomerPartLinkageSliceSelector,
+  getAllCustomerPartLinkage,
+} from '../../store/slices/customerPartLinkage.slice';
+import AddCustomerPartLinkagePage from './AddCustomerPartLinkagePage';
 import {
-  CreateEmployeeMasterType,
-  DeleteEmployeeMasterType,
-} from '../../types/employeeMaster/employeeMasterPayloadType';
+  CreateCustomerPartLinkageType,
+  DeleteCustomerPartLinkageType,
+} from '../../types/customerPartLinkage/customerPartLinkagePayloadType';
 import {
-  deleteEmployeeMasterApi,
-  updateEmployeeMasteriApi,
-} from '../../services/EmployeeMasterApi';
+  deleteCustomerPartLinkageApi,
+  updateCustomerPartLinkageiApi,
+} from '../../services/CustomerPartLinkageApi';
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import SosConfirmModal from '../../component/SosConfirmModal';
 import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
 
-interface EmployeeMasterPageType {
+interface CustomerPartLinkagePageType {
   id: number;
-  name: string;
-  eid: string;
-  role: number;
-  password: number;
+  customer_name: string;
+  part_no: number;
+  customer_part_no: string;
+  quantity: string;
   status: number;
   created_on: string;
 }
 
-type DataIndex = keyof EmployeeMasterPageType;
+type DataIndex = keyof CustomerPartLinkagePageType;
 
-const EmployeeMasterPage = () => {
+const CustomerPartLinkagePage = () => {
   const searchInput = useRef<InputRef>(null);
   const dispatch = useDispatch();
-  const { isEmployeeMasterLoading, totalEmployeeMaster, employeeMasterData } =
-    useSelector(EmployeeMasterSliceSelector);
+  const {
+    isCustomerPartLinkageLoading,
+    totalCustomerPartLinkage,
+    customerPartLinkageData,
+  } = useSelector(CustomerPartLinkageSliceSelector);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentPageSize, setCurrentPageSize] = useState<number>(10);
   const [totalPages, setTotalPage] = useState<number>(0);
 
-  const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState<boolean>(false);
-  const [employeeMastersList, setEmployeeMastersList] = useState([]);
-  const [isSpinning, setIsSpinning] = useState<boolean>(false);
-  const [isUpdateEmployeeModal, setIsUpdateEmployeeModal] =
+  const [isAddCustomerPartLinkageOpen, setIsAddCustomerPartLinkageOpen] =
     useState<boolean>(false);
+  const [customerPartLinkageList, setCustomerPartLinkageList] = useState([]);
+  const [isSpinning, setIsSpinning] = useState<boolean>(false);
+  const [
+    isUpdateCustomerPartLinkageModal,
+    setIsUpdateCustomerPartLinkageModal,
+  ] = useState<boolean>(false);
   const [updateModalData, setUpdateModalData] = useState(null);
   const [searchFilters, setSearchFilters] = useState({
-    name: '',
-    eid: '',
-    role: 0,
+    customer_name: '',
+    part_no: '',
   });
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [selectedItemToDelete, setSelectedItemToDelete] = useState<any>();
 
   // When component render below code has called and fetch  GET ALL Part masters api.
   useEffect(() => {
-    dispatch(getAllEmployeeMasters());
+    dispatch(getAllCustomerPartLinkage());
   }, []);
 
   // Success response of get Parts data into below code
   useEffect(() => {
     let dataModify: any = [];
-    if (employeeMasterData.length) {
-      dataModify = employeeMasterData.map((item: any) => ({
+    if (customerPartLinkageData.length) {
+      dataModify = customerPartLinkageData.map((item: any) => ({
         ...item,
         created_on: moment(item.created_on).format('DD-MM-YYYY'),
       }));
     }
 
-    setEmployeeMastersList(dataModify);
-  }, [employeeMasterData]);
+    setCustomerPartLinkageList(dataModify);
+  }, [customerPartLinkageData]);
 
   // Set total Part masters count
   useEffect(() => {
-    setTotalPage(totalEmployeeMaster);
-  }, [totalEmployeeMaster]);
+    setTotalPage(totalCustomerPartLinkage);
+  }, [totalCustomerPartLinkage]);
 
   // Set Spinner
   useEffect(() => {
-    setIsSpinning(isEmployeeMasterLoading);
-  }, [isEmployeeMasterLoading]);
+    setIsSpinning(isCustomerPartLinkageLoading);
+  }, [isCustomerPartLinkageLoading]);
 
   const handleSearch = (
     selectedKeys: string[],
@@ -105,7 +110,7 @@ const EmployeeMasterPage = () => {
 
   const getColumnSearchProps = (
     dataIndex: DataIndex,
-  ): ColumnType<EmployeeMasterPageType> => ({
+  ): ColumnType<CustomerPartLinkagePageType> => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -159,7 +164,7 @@ const EmployeeMasterPage = () => {
     ),
   });
 
-  const columns: ColumnsType<EmployeeMasterPageType> = [
+  const columns: ColumnsType<CustomerPartLinkagePageType> = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -167,22 +172,27 @@ const EmployeeMasterPage = () => {
       align: 'center',
     },
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      ...getColumnSearchProps('name'),
+      title: 'Customer Name',
+      dataIndex: 'customer_name',
+      key: 'customer_name',
+      ...getColumnSearchProps('customer_name'),
     },
     {
-      title: 'Employee ID',
-      dataIndex: 'eid',
-      key: 'eid',
-      ...getColumnSearchProps('eid'),
+      title: 'Part Number',
+      dataIndex: 'part_no',
+      key: 'part_no',
+      ...getColumnSearchProps('part_no'),
     },
     {
-      title: 'Role',
-      key: 'role',
-      dataIndex: 'role',
-      ...getColumnSearchProps('role'),
+      title: 'Customer Part Number',
+      key: 'customer_part_no',
+      dataIndex: 'customer_part_no',
+    },
+    {
+      title: 'Packaging Qty',
+      key: 'quantity',
+      dataIndex: 'quantity',
+      align: 'center',
     },
     {
       title: 'Status',
@@ -208,7 +218,7 @@ const EmployeeMasterPage = () => {
         <>
           <div style={{ cursor: 'pointer' }}>
             <SosEllipsisDropdown
-              editLabel="Edit Employee"
+              editLabel="Edit Part"
               item={record}
               handleEditUser={() => onHandleEditUser(record)}
               handleUpdateStatus={status =>
@@ -233,9 +243,8 @@ const EmployeeMasterPage = () => {
     setTotalPage(pageInfo.total);
 
     const searchFilt = {
-      name: filters.name ? filters.name[0] : '',
-      eid: filters.eid ? filters.eid[0] : '',
-      role: filters.role ? filters.role[0] : 0,
+      customer_name: filters.customer_name ? filters.customer_name[0] : '',
+      part_no: filters.part_no ? filters.part_no[0] : '',
     };
     setSearchFilters(searchFilt);
     onApplyFilters(searchFilt, pageInfo.current, pageInfo.pageSize);
@@ -243,23 +252,26 @@ const EmployeeMasterPage = () => {
 
   const onHandleEditUser = (record: any) => {
     setUpdateModalData(record);
-    setIsUpdateEmployeeModal(true);
-    setIsAddEmployeeOpen(true);
+    setIsUpdateCustomerPartLinkageModal(true);
+    setIsAddCustomerPartLinkageOpen(true);
   };
 
   const onHandleUpdateStatus = async (status: boolean, record: any) => {
-    const params: CreateEmployeeMasterType = {
+    const params: CreateCustomerPartLinkageType = {
       id: record.id,
-      name: record.name,
-      eid: record.eid,
-      role: record.role,
-      password: record.password,
+      customer_name: record.customer_name,
+      customer_id: record.customer_id,
+      part_no: record.part_no,
+      part_id: record.part_id,
+      barcode: record.barcode,
       status: status ? 1 : 0,
+      quantity: record.quantity,
+      customer_part_no: record.customer_part_no,
     };
 
     try {
       setIsSpinning(true);
-      const response = await updateEmployeeMasteriApi(params);
+      const response = await updateCustomerPartLinkageiApi(params);
       if (response && response.data) {
         handleSuccessResponse(response.data);
       }
@@ -274,7 +286,7 @@ const EmployeeMasterPage = () => {
         title: successResponse.message,
         type: 'success',
       });
-      dispatch(getAllEmployeeMasters());
+      dispatch(getAllCustomerPartLinkage());
     } else {
       PopupMessagePage({
         title: successResponse.message,
@@ -295,13 +307,13 @@ const EmployeeMasterPage = () => {
   };
 
   const deleteSelectedItem = async () => {
-    const params: DeleteEmployeeMasterType = {
+    const params: DeleteCustomerPartLinkageType = {
       id: selectedItemToDelete.id,
       markDelete: 1,
     };
     try {
       setIsSpinning(true);
-      const response = await deleteEmployeeMasterApi(params);
+      const response = await deleteCustomerPartLinkageApi(params);
       if (response && response.data) {
         PopupMessagePage({
           title: response.data.data,
@@ -310,7 +322,7 @@ const EmployeeMasterPage = () => {
         setIsSpinning(false);
         setDeleteModalVisible(false);
         setSelectedItemToDelete(null);
-        dispatch(getAllEmployeeMasters());
+        dispatch(getAllCustomerPartLinkage());
       }
     } catch (e) {
       setIsSpinning(false);
@@ -323,7 +335,7 @@ const EmployeeMasterPage = () => {
       page: page ? page : currentPage,
       page_size: page_size ? page_size : currentPageSize,
     };
-    dispatch(getAllEmployeeMasters(params));
+    dispatch(getAllCustomerPartLinkage(params));
   };
 
   return (
@@ -334,16 +346,18 @@ const EmployeeMasterPage = () => {
             type="primary"
             ghost
             icon={<PlusOutlined />}
-            onClick={() => setIsAddEmployeeOpen(!isAddEmployeeOpen)}
+            onClick={() =>
+              setIsAddCustomerPartLinkageOpen(!isAddCustomerPartLinkageOpen)
+            }
           >
-            Add Employee Master
+            Add Part Master
           </Button>
         </Col>
         <Col span={24}>
           <Table
             className="sos-ant-table"
             columns={columns}
-            dataSource={employeeMastersList}
+            dataSource={customerPartLinkageList}
             bordered
             pagination={{
               showSizeChanger: true,
@@ -358,14 +372,14 @@ const EmployeeMasterPage = () => {
         </Col>
       </Row>
 
-      {isAddEmployeeOpen && (
-        <AddEmployeeMasterPage
-          isModalOpen={isAddEmployeeOpen}
-          isUpdateModal={isUpdateEmployeeModal}
+      {isAddCustomerPartLinkageOpen && (
+        <AddCustomerPartLinkagePage
+          isModalOpen={isAddCustomerPartLinkageOpen}
+          isUpdateModal={isUpdateCustomerPartLinkageModal}
           updateModalData={updateModalData}
           onCloseModal={() => {
-            setIsUpdateEmployeeModal(false);
-            setIsAddEmployeeOpen(!isAddEmployeeOpen);
+            setIsUpdateCustomerPartLinkageModal(false);
+            setIsAddCustomerPartLinkageOpen(!isAddCustomerPartLinkageOpen);
             setUpdateModalData(null);
           }}
         />
@@ -375,8 +389,8 @@ const EmployeeMasterPage = () => {
       {deleteModalVisible && (
         <SosConfirmModal
           visible={deleteModalVisible}
-          title="Remove Employee Master"
-          bodyText={`Are you sure you want to delete ${selectedItemToDelete.name}`}
+          title="Remove Customer Part Linkage"
+          bodyText={`Are you sure you want to delete ${selectedItemToDelete.customer_name}`}
           onConfirm={onConfirm}
         />
       )}
@@ -384,4 +398,4 @@ const EmployeeMasterPage = () => {
   );
 };
 
-export default EmployeeMasterPage;
+export default CustomerPartLinkagePage;

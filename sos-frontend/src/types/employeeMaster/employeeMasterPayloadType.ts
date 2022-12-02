@@ -1,17 +1,21 @@
 export type EmployeeMastersAllType = {
   page?: number;
   page_size?: number;
-  name?: string;
-  phone?: string;
-  contact_person?: string;
+  name: string;
+  eid: string;
+  role: number;
 };
 
 export type CreateEmployeeMasterType = {
   id?: number;
   name: string;
-  code: string;
-  contact_person: string;
-  phone: number | string;
+  role: number;
+  password: string;
   status: number;
-  address: string;
+  eid: string;
+};
+
+export type DeleteEmployeeMasterType = {
+  id: number;
+  markDelete: number;
 };

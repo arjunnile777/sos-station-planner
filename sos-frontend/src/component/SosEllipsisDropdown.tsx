@@ -7,6 +7,7 @@ type SosEllipsisDropdownType = {
   handleEditUser: () => void;
   handleUpdateStatus: (status: boolean) => void;
   editLabel?: string;
+  handleRemove: () => void;
 };
 
 const SosEllipsisDropdown = ({
@@ -14,6 +15,7 @@ const SosEllipsisDropdown = ({
   handleEditUser,
   handleUpdateStatus,
   editLabel = 'EDIT USER',
+  handleRemove,
 }: SosEllipsisDropdownType) => {
   const [open, setOpen] = useState(false);
   const [isChecked, setIsChecked] = useState<boolean | undefined>(
@@ -30,6 +32,9 @@ const SosEllipsisDropdown = ({
     if (e.key === 'edit') {
       handleEditUser();
     }
+    if (e.key === 'remove') {
+      handleRemove();
+    }
   };
 
   const handleOpenChange = (flag: boolean) => {
@@ -44,6 +49,10 @@ const SosEllipsisDropdown = ({
         {
           label: editLabel,
           key: 'edit',
+        },
+        {
+          label: 'Remove',
+          key: 'remove',
         },
         {
           type: 'divider',

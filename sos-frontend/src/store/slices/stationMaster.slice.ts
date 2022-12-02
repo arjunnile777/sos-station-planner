@@ -14,7 +14,7 @@ export const getAllStationMasters: any = createAsyncThunk(
   'stationMaster/getAllStationMasters',
   async (payload?: StationMastersAllType) => {
     const response = await getAllStationMasterApi(payload);
-    return response.data.data;
+    return response.data;
   },
 );
 
@@ -33,8 +33,8 @@ export const StationMasterSlice = createSlice({
       getAllStationMasters.fulfilled,
       (state: StationMasterState, { payload }) => {
         state.isStationMasterLoading = false;
-        state.stationMasterData = payload;
-        state.totalStationMaster = payload.length;
+        state.stationMasterData = payload.data;
+        state.totalStationMaster = payload.total_count;
       },
     );
     builder.addCase(

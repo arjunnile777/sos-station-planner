@@ -19,3 +19,8 @@ export const KEY_EMPLOYEE_MASTER = 'employee_master';
 export const KEY_PLANNING = 'planning';
 export const KEY_CLIENT = 'client';
 export const KEY_REPORTS = 'reports';
+
+//Table max height
+export const TABLE_MAX_HEIGHT_OBJECT = {
+  y: 400,
+};

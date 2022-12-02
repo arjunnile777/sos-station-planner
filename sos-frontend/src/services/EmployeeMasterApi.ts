@@ -1,5 +1,6 @@
 import {
   CreateEmployeeMasterType,
+  DeleteEmployeeMasterType,
   EmployeeMastersAllType,
 } from '../types/employeeMaster/employeeMasterPayloadType';
 import { http } from './api';
@@ -13,5 +14,5 @@ export const addEmployeeMasteriApi = (payload: CreateEmployeeMasterType) =>
 export const updateEmployeeMasteriApi = (payload: CreateEmployeeMasterType) =>
   http.put(`/employee/update/${payload.id}`, payload);
 
-// export const deleteHolidayApi = (payload: CreatePartMasterType) =>
-//   http.post(`/delete-holiday/${payload.id}`);
+export const deleteEmployeeMasterApi = (payload: DeleteEmployeeMasterType) =>
+  http.put(`/employee/temp-delete/${payload.id}`);

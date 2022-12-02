@@ -13,13 +13,21 @@ import {
   StationMasterSliceSelector,
 } from '../../store/slices/stationMaster.slice';
 import AddStationMasterPage from './AddStationMasterPage';
+import {
+  CreateStationMasterType,
+  DeleteStationMasterType,
+} from '../../types/stationMaster/stationMasterPayloadType';
+import {
+  deleteStationMasterApi,
+  updateStationMasteriApi,
+} from '../../services/StationMasterApi';
+import { PopupMessagePage } from '../../component/PopupMessagePage';
+import SosConfirmModal from '../../component/SosConfirmModal';
+import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
 
 interface StationMasterPageType {
   id: number;
-  name: string;
-  code: number;
-  contact_person: string;
-  phone: number;
+  station_name: string;
   status: number;
   created_on: string;
 }
@@ -42,10 +50,10 @@ const StationMasterPage = () => {
     useState<boolean>(false);
   const [updateModalData, setUpdateModalData] = useState(null);
   const [searchFilters, setSearchFilters] = useState({
-    name: '',
-    phone: '',
-    contact_person: '',
+    station_name: '',
   });
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [selectedItemToDelete, setSelectedItemToDelete] = useState<any>();
 
   // When component render below code has called and fetch  GET ALL Part masters api.
   useEffect(() => {
@@ -155,27 +163,9 @@ const StationMasterPage = () => {
     },
     {
       title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      ...getColumnSearchProps('name'),
-    },
-    {
-      title: 'Code',
-      dataIndex: 'code',
-      key: 'code',
-    },
-    {
-      title: 'Contact Person',
-      key: 'contact_person',
-      dataIndex: 'contact_person',
-      ...getColumnSearchProps('contact_person'),
-    },
-    {
-      title: 'Phone no',
-      key: 'phone',
-      dataIndex: 'phone',
-      align: 'center',
-      ...getColumnSearchProps('phone'),
+      dataIndex: 'station_name',
+      key: 'station_name',
+      ...getColumnSearchProps('station_name'),
     },
     {
       title: 'Status',
@@ -204,7 +194,10 @@ const StationMasterPage = () => {
               editLabel="Edit Part"
               item={record}
               handleEditUser={() => onHandleEditUser(record)}
-              handleUpdateStatus={onHandleUpdateStatus}
+              handleUpdateStatus={status =>
+                onHandleUpdateStatus(status, record)
+              }
+              handleRemove={() => onHandleRemove(record)}
             />
           </div>
         </>
@@ -223,9 +216,7 @@ const StationMasterPage = () => {
     setTotalPage(pageInfo.total);
 
     const searchFilt = {
-      name: filters.name ? filters.name[0] : '',
-      phone: filters.phone ? filters.phone[0] : '',
-      contact_person: filters.contact_person ? filters.contact_person[0] : '',
+      station_name: filters.station_name ? filters.station_name[0] : '',
     };
     setSearchFilters(searchFilt);
     onApplyFilters(searchFilt, pageInfo.current, pageInfo.pageSize);
@@ -237,8 +228,71 @@ const StationMasterPage = () => {
     setIsAddStationOpen(true);
   };
 
-  const onHandleUpdateStatus = () => {
-    console.log('Handle on update status');
+  const onHandleUpdateStatus = async (status: boolean, record: any) => {
+    const params: CreateStationMasterType = {
+      id: record.id,
+      station_name: record.station_name,
+      status: status ? 1 : 0,
+    };
+
+    try {
+      setIsSpinning(true);
+      const response = await updateStationMasteriApi(params);
+      if (response && response.data) {
+        handleSuccessResponse(response.data);
+      }
+    } catch (e) {
+      setIsSpinning(false);
+    }
+  };
+
+  const handleSuccessResponse = (successResponse: any) => {
+    if (successResponse) {
+      PopupMessagePage({
+        title: successResponse.message,
+        type: 'success',
+      });
+      dispatch(getAllStationMasters());
+    } else {
+      PopupMessagePage({
+        title: successResponse.message,
+        type: 'warning',
+      });
+    }
+    setIsSpinning(false);
+  };
+
+  const onHandleRemove = (record: any) => {
+    setDeleteModalVisible(true);
+    setSelectedItemToDelete(record);
+  };
+
+  const onConfirm = (confirm: boolean) => {
+    if (confirm && selectedItemToDelete) deleteSelectedItem();
+    else setDeleteModalVisible(false);
+  };
+
+  const deleteSelectedItem = async () => {
+    const params: DeleteStationMasterType = {
+      id: selectedItemToDelete.id,
+      markDelete: 1,
+    };
+    try {
+      setIsSpinning(true);
+      const response = await deleteStationMasterApi(params);
+      if (response && response.data) {
+        PopupMessagePage({
+          title: response.data.data,
+          type: 'success',
+        });
+        setIsSpinning(false);
+        setDeleteModalVisible(false);
+        setSelectedItemToDelete(null);
+        dispatch(getAllStationMasters());
+      }
+    } catch (e) {
+      setIsSpinning(false);
+    }
   };
 
   const onApplyFilters = (filters: any, page?: number, page_size?: number) => {
@@ -260,7 +314,7 @@ const StationMasterPage = () => {
             icon={<PlusOutlined />}
             onClick={() => setIsAddStationOpen(!isAddStationOpen)}
           >
-            Add Part Master
+            Add Station Master
           </Button>
         </Col>
         <Col span={24}>
@@ -277,6 +331,7 @@ const StationMasterPage = () => {
               pageSize: currentPageSize,
             }}
             onChange={onChangePagination}
+            scroll={TABLE_MAX_HEIGHT_OBJECT}
           />
         </Col>
       </Row>
@@ -295,6 +350,14 @@ const StationMasterPage = () => {
       )}
 
       {isSpinning ? <CustomSpinner /> : ''}
+      {deleteModalVisible && (
+        <SosConfirmModal
+          visible={deleteModalVisible}
+          title="Remove Station Master"
+          bodyText={`Are you sure you want to delete ${selectedItemToDelete.station_name}`}
+          onConfirm={onConfirm}
+        />
+      )}
     </>
   );
 };

@@ -13,13 +13,23 @@ import {
   PartMasterSliceSelector,
 } from '../../store/slices/partMaster.slice';
 import AddPartMasterPage from './AddPartMasterPage';
+import {
+  CreatePartMasterType,
+  DeletePartMasterType,
+} from '../../types/partMaster/partMasterPayloadType';
+import {
+  deletePartMasterApi,
+  updatePartMasteriApi,
+} from '../../services/PartMasterApi';
+import { PopupMessagePage } from '../../component/PopupMessagePage';
+import SosConfirmModal from '../../component/SosConfirmModal';
+import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
 
 interface PartMasterPageType {
   id: number;
-  name: string;
-  code: number;
-  contact_person: string;
-  phone: number;
+  part_no: string;
+  description: string;
+  um: string;
   status: number;
   created_on: string;
 }
@@ -41,10 +51,10 @@ const PartMasterPage = () => {
   const [isUpdatePartModal, setIsUpdatePartModal] = useState<boolean>(false);
   const [updateModalData, setUpdateModalData] = useState(null);
   const [searchFilters, setSearchFilters] = useState({
-    name: '',
-    phone: '',
-    contact_person: '',
+    part_no: '',
   });
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [selectedItemToDelete, setSelectedItemToDelete] = useState<any>();
 
   // When component render below code has called and fetch  GET ALL Part masters api.
   useEffect(() => {
@@ -153,28 +163,21 @@ const PartMasterPage = () => {
       align: 'center',
     },
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      ...getColumnSearchProps('name'),
+      title: 'Part Number',
+      dataIndex: 'part_no',
+      key: 'part_no',
+      ...getColumnSearchProps('part_no'),
     },
     {
-      title: 'Code',
-      dataIndex: 'code',
-      key: 'code',
+      title: 'Description',
+      dataIndex: 'part_description',
+      key: 'part_description',
     },
     {
-      title: 'Contact Person',
-      key: 'contact_person',
-      dataIndex: 'contact_person',
-      ...getColumnSearchProps('contact_person'),
-    },
-    {
-      title: 'Phone no',
-      key: 'phone',
-      dataIndex: 'phone',
+      title: 'UoM',
+      key: 'uom',
+      dataIndex: 'uom',
       align: 'center',
-      ...getColumnSearchProps('phone'),
     },
     {
       title: 'Status',
@@ -203,7 +206,10 @@ const PartMasterPage = () => {
               editLabel="Edit Part"
               item={record}
               handleEditUser={() => onHandleEditUser(record)}
-              handleUpdateStatus={onHandleUpdateStatus}
+              handleUpdateStatus={status =>
+                onHandleUpdateStatus(status, record)
+              }
+              handleRemove={() => onHandleRemove(record)}
             />
           </div>
         </>
@@ -222,9 +228,7 @@ const PartMasterPage = () => {
     setTotalPage(pageInfo.total);
 
     const searchFilt = {
-      name: filters.name ? filters.name[0] : '',
-      phone: filters.phone ? filters.phone[0] : '',
-      contact_person: filters.contact_person ? filters.contact_person[0] : '',
+      part_no: filters.part_no ? filters.part_no[0] : '',
     };
     setSearchFilters(searchFilt);
     onApplyFilters(searchFilt, pageInfo.current, pageInfo.pageSize);
@@ -236,8 +240,73 @@ const PartMasterPage = () => {
     setIsAddPartOpen(true);
   };
 
-  const onHandleUpdateStatus = () => {
-    console.log('Handle on update status');
+  const onHandleUpdateStatus = async (status: boolean, record: any) => {
+    const params: CreatePartMasterType = {
+      id: record.id,
+      part_no: record.part_no,
+      uom: record.uom,
+      part_description: record.part_description,
+      status: status ? 1 : 0,
+    };
+
+    try {
+      setIsSpinning(true);
+      const response = await updatePartMasteriApi(params);
+      if (response && response.data) {
+        handleSuccessResponse(response.data);
+      }
+    } catch (e) {
+      setIsSpinning(false);
+    }
+  };
+
+  const handleSuccessResponse = (successResponse: any) => {
+    if (successResponse) {
+      PopupMessagePage({
+        title: successResponse.message,
+        type: 'success',
+      });
+      dispatch(getAllPartMasters());
+    } else {
+      PopupMessagePage({
+        title: successResponse.message,
+        type: 'warning',
+      });
+    }
+    setIsSpinning(false);
+  };
+
+  const onHandleRemove = (record: any) => {
+    setDeleteModalVisible(true);
+    setSelectedItemToDelete(record);
+  };
+
+  const onConfirm = (confirm: boolean) => {
+    if (confirm && selectedItemToDelete) deleteSelectedItem();
+    else setDeleteModalVisible(false);
+  };
+
+  const deleteSelectedItem = async () => {
+    const params: DeletePartMasterType = {
+      id: selectedItemToDelete.id,
+      markDelete: 1,
+    };
+    try {
+      setIsSpinning(true);
+      const response = await deletePartMasterApi(params);
+      if (response && response.data) {
+        PopupMessagePage({
+          title: response.data.data,
+          type: 'success',
+        });
+        setIsSpinning(false);
+        setDeleteModalVisible(false);
+        setSelectedItemToDelete(null);
+        dispatch(getAllPartMasters());
+      }
+    } catch (e) {
+      setIsSpinning(false);
+    }
   };
 
   const onApplyFilters = (filters: any, page?: number, page_size?: number) => {
@@ -276,6 +345,7 @@ const PartMasterPage = () => {
               pageSize: currentPageSize,
             }}
             onChange={onChangePagination}
+            scroll={TABLE_MAX_HEIGHT_OBJECT}
           />
         </Col>
       </Row>
@@ -294,6 +364,14 @@ const PartMasterPage = () => {
       )}
 
       {isSpinning ? <CustomSpinner /> : ''}
+      {deleteModalVisible && (
+        <SosConfirmModal
+          visible={deleteModalVisible}
+          title="Remove Part Master"
+          bodyText={`Are you sure you want to delete ${selectedItemToDelete.part_no}`}
+          onConfirm={onConfirm}
+        />
+      )}
     </>
   );
 };

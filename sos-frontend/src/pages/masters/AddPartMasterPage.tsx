@@ -21,20 +21,16 @@ type AddPartMasterPageType = {
 };
 
 type InputFieldsType = {
-  nameValue: string;
-  codeValue: string;
-  addressValue: string;
-  contactPersonValue: string;
-  phoneNumberValue: string;
+  partNumber: string;
+  uomValue: string;
+  partDescription: string;
   statusValue: boolean;
 };
 
 type InputErrorFieldsType = {
-  nameValueError: string;
-  codeValueError: string;
-  addressValueError: string;
-  contactPersonValueError: string;
-  phoneNumberValueError: string;
+  partNumberError: string;
+  uomValueError: string;
+  partDescriptionError: string;
 };
 
 const AddPartMasterPage = ({
@@ -46,33 +42,25 @@ const AddPartMasterPage = ({
   const dispatch = useDispatch();
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [inputFieldsValues, setInputFieldsValues] = useState<InputFieldsType>({
-    nameValue: '',
-    codeValue: '',
-    addressValue: '',
-    contactPersonValue: '',
-    phoneNumberValue: '',
+    partNumber: '',
+    uomValue: '',
+    partDescription: '',
     statusValue: true,
   });
 
   const [inputErrorFieldsValues, setInputErrorFieldsValues] =
     useState<InputErrorFieldsType>({
-      nameValueError: '',
-      codeValueError: '',
-      addressValueError: '',
-      contactPersonValueError: '',
-      phoneNumberValueError: '',
+      partNumberError: '',
+      uomValueError: '',
+      partDescriptionError: '',
     });
 
   useEffect(() => {
-    console.log('updateModalData==', updateModalData);
-    console.log(isUpdateModal);
     if (isUpdateModal && updateModalData) {
       const fields = {
-        nameValue: updateModalData.name,
-        codeValue: updateModalData.code,
-        addressValue: updateModalData.address,
-        contactPersonValue: updateModalData.contact_person,
-        phoneNumberValue: updateModalData.phone,
+        partNumber: updateModalData.part_no,
+        uomValue: updateModalData.uom,
+        partDescription: updateModalData.part_description,
         statusValue: updateModalData.status === 1 ? true : false,
       };
       setInputFieldsValues(fields);
@@ -101,18 +89,14 @@ const AddPartMasterPage = ({
   const handleSubmit = () => {
     console.log('Entered all values=', inputFieldsValues);
     if (
-      inputFieldsValues.nameValue &&
-      inputFieldsValues.codeValue &&
-      inputFieldsValues.contactPersonValue &&
-      inputFieldsValues.addressValue &&
-      inputFieldsValues.phoneNumberValue
+      inputFieldsValues.partNumber &&
+      inputFieldsValues.uomValue &&
+      inputFieldsValues.partDescription
     ) {
       const params: CreatePartMasterType = {
-        name: inputFieldsValues.nameValue,
-        code: inputFieldsValues.codeValue,
-        contact_person: inputFieldsValues.contactPersonValue,
-        address: inputFieldsValues.addressValue,
-        phone: inputFieldsValues.phoneNumberValue,
+        part_no: inputFieldsValues.partNumber,
+        uom: inputFieldsValues.uomValue,
+        part_description: inputFieldsValues.partDescription,
         status: inputFieldsValues.statusValue ? 1 : 0,
       };
       if (isUpdateModal) {
@@ -124,20 +108,14 @@ const AddPartMasterPage = ({
     } else {
       const fieldsObj = { ...inputErrorFieldsValues };
 
-      if (!inputFieldsValues.nameValue)
-        fieldsObj.nameValueError = 'Name is required field';
+      if (!inputFieldsValues.partNumber)
+        fieldsObj.partNumberError = 'Part number is required field';
 
-      if (!inputFieldsValues.codeValue)
-        fieldsObj.codeValueError = 'Code is required field';
+      if (!inputFieldsValues.uomValue)
+        fieldsObj.uomValueError = 'UOM is required field';
 
-      if (!inputFieldsValues.contactPersonValue)
-        fieldsObj.contactPersonValueError = 'Contact person is required field';
-
-      if (!inputFieldsValues.addressValue)
-        fieldsObj.addressValueError = 'Address is required field';
-
-      if (!inputFieldsValues.phoneNumberValue)
-        fieldsObj.phoneNumberValueError = 'Phone Number is required field';
+      if (!inputFieldsValues.partDescription)
+        fieldsObj.partDescriptionError = 'Part description is required field';
 
       setInputErrorFieldsValues({
         ...fieldsObj,
@@ -189,20 +167,16 @@ const AddPartMasterPage = ({
 
   const resetData = () => {
     const fieldsClear = {
-      nameValue: '',
-      codeValue: '',
-      addressValue: '',
-      contactPersonValue: '',
-      phoneNumberValue: '',
+      partNumber: '',
+      uomValue: '',
+      partDescription: '',
       statusValue: false,
     };
 
     const fieldsError = {
-      nameValueError: '',
-      codeValueError: '',
-      addressValueError: '',
-      contactPersonValueError: '',
-      phoneNumberValueError: '',
+      partNumberError: '',
+      uomValueError: '',
+      partDescriptionError: '',
     };
 
     setInputFieldsValues(fieldsClear);
@@ -221,45 +195,30 @@ const AddPartMasterPage = ({
         <Col span={3}></Col>
         <Col span={18}>
           <SosInputComponentType
-            label="Part Name"
-            value={inputFieldsValues.nameValue}
-            error={inputErrorFieldsValues.nameValueError}
-            name="nameValue"
+            label="Part Number"
+            value={inputFieldsValues.partNumber}
+            error={inputErrorFieldsValues.partNumberError}
+            name="partNumber"
             onChange={onChangeInputChange}
             required
-          />
-          <SosInputComponentType
-            label="Code"
-            required
-            value={inputFieldsValues.codeValue}
-            error={inputErrorFieldsValues.codeValueError}
-            name="codeValue"
-            onChange={onChangeInputChange}
           />
           <SosTextAreaComponent
-            label="Address"
+            label="Part Description"
             required
-            value={inputFieldsValues.addressValue}
-            error={inputErrorFieldsValues.addressValueError}
-            name="addressValue"
+            value={inputFieldsValues.partDescription}
+            error={inputErrorFieldsValues.partDescriptionError}
+            name="partDescription"
             onChange={onChangeInputChange}
           />
           <SosInputComponentType
-            label="Contact Person"
+            label="UOM"
             required
-            value={inputFieldsValues.contactPersonValue}
-            error={inputErrorFieldsValues.contactPersonValueError}
-            name="contactPersonValue"
+            value={inputFieldsValues.uomValue}
+            error={inputErrorFieldsValues.uomValueError}
+            name="uomValue"
             onChange={onChangeInputChange}
           />
-          <SosInputComponentType
-            label="Phone Number"
-            required
-            value={inputFieldsValues.phoneNumberValue}
-            error={inputErrorFieldsValues.phoneNumberValueError}
-            name="phoneNumberValue"
-            onChange={onChangeInputChange}
-          />
+
           <Space className="sos-switch-cs">
             <span className="sos-switch-label">Part Status : </span>
             <Switch
