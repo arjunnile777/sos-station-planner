@@ -15,7 +15,14 @@ const rightContent = [
         </Fragment>
       }
     >
-      <Menu.Item key="SignOut">Sign out</Menu.Item>
+      <Menu.Item
+        key="SignOut"
+        onClick={() => {
+          window.location.replace('/login');
+        }}
+      >
+        Sign out
+      </Menu.Item>
     </SubMenu>
   </Menu>,
 ];

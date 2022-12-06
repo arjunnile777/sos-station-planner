@@ -13,11 +13,17 @@ export type CreatePlanningType = {
   scanned_quantity: string;
   total_quantity: string;
   status: number;
+  release_count: string | number;
 };
 
 export type UpdatePlanningType = {
   id?: number;
   status: number;
+};
+
+export type UpdatePlanningScannedQuantityType = {
+  id?: number;
+  scanned_quantity: number;
 };
 
 export type DeletePlanningType = {

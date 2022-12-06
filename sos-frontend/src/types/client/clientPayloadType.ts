@@ -8,6 +8,7 @@ export type CreateClientType = {
   barcode: string;
   customer_id?: string | number;
   part_no: string | number;
+  order_no: string;
 };
 
 export type DeleteClientType = {

@@ -20,6 +20,7 @@ import {
   getAllCustomers,
   getAllPartNumbers,
 } from '../../store/slices/customerPartLinkage.slice';
+import { getTotalQuantityApi } from '../../services/CustomerPartLinkageApi';
 
 const PLANNING_STATUS = [
   {
@@ -117,12 +118,12 @@ const AddPlanningPage = ({
     setReleaseQuantityValue(e.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       selectedCustomer &&
       selectedPart &&
       releaseQuantityValue &&
-      planningStatus
+      (planningStatus || planningStatus === 0)
     ) {
       const custN: any = customersListData.filter(
         (item: any) => item.value == selectedCustomer,
@@ -138,16 +139,27 @@ const AddPlanningPage = ({
         };
         handleUpdatePlanning(params);
       } else {
-        const params: CreatePlanningType = {
-          customer_name: custN[0].name,
-          customer_id: selectedCustomer,
-          part_no: partN[0].part_no,
-          part_id: selectedPart,
-          scanned_quantity: '0',
-          total_quantity: releaseQuantityValue,
-          status: planningStatus,
-        };
-        handleAddPlanning(params);
+        try {
+          const response = await getTotalQuantityApi({
+            customer_id: selectedCustomer,
+            part_id: selectedPart,
+          });
+          if (response && response.data) {
+            const params: CreatePlanningType = {
+              customer_name: custN[0].name,
+              customer_id: selectedCustomer,
+              part_no: partN[0].part_no,
+              part_id: selectedPart,
+              scanned_quantity: '0',
+              release_count: parseInt(releaseQuantityValue),
+              total_quantity: response.data.data[0].quantity,
+              status: planningStatus,
+            };
+            handleAddPlanning(params);
+          }
+        } catch (e) {
+          console.log('error');
+        }
       }
     } else {
       if (!selectedCustomer)

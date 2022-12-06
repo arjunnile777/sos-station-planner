@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Modal, Row } from 'antd';
 
 import SosInputComponentType from '../../component/SosInputComponent';
@@ -6,6 +6,7 @@ import CustomSpinner from '../../component/CustomSpinner';
 import { loginApi } from '../../services/LoginApi';
 import { useNavigate } from 'react-router-dom';
 import { setAccessToken } from '../../utils/localStorage';
+import { ACCESS_TOKEN } from '../../constants';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,9 @@ const LoginPage = () => {
   const [passwordValueError, setPasswordValueError] = useState<string>('');
   const [commongLoginError, setCommongLoginError] = useState<string>('');
 
+  useEffect(() => {
+    localStorage.removeItem(ACCESS_TOKEN);
+  }, []);
   const onLoginClick = async () => {
     if (usernameValue && passwordValue) {
       setCommongLoginError('');

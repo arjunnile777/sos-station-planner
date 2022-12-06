@@ -6,13 +6,17 @@ type PageHeaderPageType = {
   btnLabel?: string;
   onBtnClick?: () => void;
   isBtnVisible?: boolean;
+  isClientBtnVisible?: boolean;
+  onClientBtnClick?: () => void;
 };
 
 const PageHeaderPage = ({
   title = '',
   btnLabel = '',
   onBtnClick,
+  onClientBtnClick,
   isBtnVisible = true,
+  isClientBtnVisible = false,
 }: PageHeaderPageType) => {
   return (
     <Row>
@@ -28,6 +32,13 @@ const PageHeaderPage = ({
             onClick={onBtnClick}
           >
             {btnLabel}
+          </Button>
+        </Col>
+      )}
+      {isClientBtnVisible && (
+        <Col span={12} style={{ textAlign: 'end', marginBottom: '10px' }}>
+          <Button type="primary" ghost onClick={onClientBtnClick}>
+            Reset
           </Button>
         </Col>
       )}

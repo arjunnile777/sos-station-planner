@@ -3,7 +3,6 @@ import { Col, Input, Row, Table } from 'antd';
 import type { InputRef } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
-import SosInputComponentType from '../../component/SosInputComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   getPlanningByOrderNo,
@@ -13,6 +12,8 @@ import CustomSpinner from '../../component/CustomSpinner';
 import PageHeaderPage from '../../component/PageHeaderPage';
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import { addClientApi, getAllClientApi } from '../../services/ClientApi';
+import { UpdatePlanningScannedQuantityType } from '../../types/planning/planningPayloadType';
+import { updateScannedQuantityApi } from '../../services/PlanningApi';
 
 interface PlanningPageType {
   customer_name: string;
@@ -41,7 +42,30 @@ const ClientPage = () => {
   const [scannedOrdersList, setScannedOrdersList] = useState<any>([]);
 
   useEffect(() => {
-    setPlanningList(individualPlanningData);
+    if (individualPlanningData.length > 0) {
+      const data: any = individualPlanningData;
+      if (data[0].scanned_quantity == data[0].total_quantity) {
+        // Order already completed.
+        PopupMessagePage({
+          title: 'This order has already completed.',
+          type: 'error',
+        });
+      } else if (data[0].status == 1) {
+        PopupMessagePage({
+          title: 'Order on HOLD.',
+          type: 'error',
+        });
+      } else if (data[0].status == 2) {
+        PopupMessagePage({
+          title: 'Order Invalid',
+          type: 'error',
+        });
+      } else {
+        setIsDisableOrderField(true);
+        setIsDisableBarcodeField(false);
+        setPlanningList(individualPlanningData);
+      }
+    }
   }, [individualPlanningData]);
 
   useEffect(() => {
@@ -54,18 +78,20 @@ const ClientPage = () => {
     }
   }, [isDisableBarcodeField]);
 
+  useEffect(() => {
+    if (!isDisableOrderField) {
+      if (orderInputRef && orderInputRef.current) {
+        orderInputRef.current!.focus({
+          cursor: 'start',
+        });
+      }
+    }
+  }, [isDisableOrderField]);
+
   // Set Spinner
   useEffect(() => {
     setIsSpinning(isPlanningLoading);
   }, [isPlanningLoading]);
-
-  useEffect(() => {
-    if (orderInputRef && orderInputRef.current) {
-      orderInputRef.current!.focus({
-        cursor: 'start',
-      });
-    }
-  }, []);
 
   const columns: ColumnsType<PlanningPageType> = [
     {
@@ -111,24 +137,24 @@ const ClientPage = () => {
   const onChangeOrderNumber = (e: any) => {
     setScannedOrderNumber(e.target.value);
     dispatch(getPlanningByOrderNo({ order_number: e.target.value }));
-    setIsDisableOrderField(true);
-    setIsDisableBarcodeField(false);
   };
 
   const onChangePartBarcode = async (e: any) => {
     setScannedPartBarcode(e.target.value);
     let custNumber: any = '';
     let partNumber: any = '';
-
+    let orderNo: any = '';
     if (planningList && planningList.length > 0) {
       custNumber = planningList[0].customer_id;
       partNumber = planningList[0].part_no;
+      orderNo = planningList[0].order_no;
     }
 
     const params: any = {
       barcode: e.target.value,
       customer_id: custNumber,
       part_no: partNumber,
+      order_no: orderNo,
     };
 
     try {
@@ -156,14 +182,18 @@ const ClientPage = () => {
       });
     }
     setIsSpinning(false);
+    updateScanQuantity();
     getScannedOrdersList();
   };
 
   const getScannedOrdersList = async () => {
+    let orderNo: any = '';
+    if (planningList && planningList.length > 0) {
+      orderNo = planningList[0].order_no;
+    }
     try {
       setIsSpinning(true);
-      const response = await getAllClientApi();
-      console.log('yoooooooo==', response);
+      const response = await getAllClientApi({ order_no: orderNo });
       if (response && response.data) {
         setScannedOrdersList(response.data.data);
         setIsSpinning(false);
@@ -173,11 +203,47 @@ const ClientPage = () => {
     }
   };
 
+  const updateScanQuantity = async () => {
+    const planList: any = { ...planningList[0] };
+    console.log(planList);
+    planList.scanned_quantity = parseInt(planList.scanned_quantity) + 1;
+
+    const params: UpdatePlanningScannedQuantityType = {
+      id: planList.id,
+      scanned_quantity: planList.scanned_quantity,
+    };
+
+    setPlanningList([{ ...planList }]);
+    try {
+      const response = await updateScannedQuantityApi(params);
+      if (response && response.data) {
+        console.log('Updated success');
+      }
+    } catch (e) {
+      console.log('Error');
+    }
+  };
+
+  const onClientBtnClick = () => {
+    console.log('Click on reset btn');
+    setPlanningList([]);
+    setScannedOrdersList([]);
+    setScannedOrderNumber('');
+    setScannedPartBarcode('');
+    setIsDisableOrderField(false);
+    setIsDisableBarcodeField(true);
+  };
+
   return (
     <>
       <Row>
         <Col span={24}>
-          <PageHeaderPage title="Client" isBtnVisible={false} />
+          <PageHeaderPage
+            title="Client"
+            isBtnVisible={false}
+            isClientBtnVisible={true}
+            onClientBtnClick={onClientBtnClick}
+          />
         </Col>
         <Col span={24}>
           <Row>
@@ -236,6 +302,7 @@ const ClientPage = () => {
                     scroll={{
                       y: 150,
                     }}
+                    pagination={false}
                   />
                 </Col>
               </Row>
