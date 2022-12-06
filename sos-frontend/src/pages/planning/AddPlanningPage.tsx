@@ -62,6 +62,7 @@ const AddPlanningPage = ({
     useState('');
   const [planningStatus, setPlanningStatus] = useState('0');
   const [planningStatusError, setPlanningStatusError] = useState('');
+  const [selectedPartDescription, setSelectedPartDescription] = useState('');
 
   useEffect(() => {
     dispatch(getAllCustomers());
@@ -129,12 +130,12 @@ const AddPlanningPage = ({
       );
 
       const params: CreatePlanningType = {
-        customer_name: custN[0].customer_name,
+        customer_name: custN[0].name,
         customer_id: selectedCustomer,
         part_no: partN[0].part_no,
         part_id: selectedPart,
-        scanned_quantity: releaseQuantityValue,
-        total_quantity: custN[0].quantity,
+        scanned_quantity: '0',
+        total_quantity: releaseQuantityValue,
         status: planningStatus,
       };
 
@@ -196,6 +197,13 @@ const AddPlanningPage = ({
     setIsSpinning(false);
   };
 
+  const onPartSelectEvent = (value: string) => {
+    const partN: any = partsListData.filter((item: any) => item.value == value);
+
+    setSelectedPartDescription(partN[0].part_description);
+    setSelectedPart(value);
+  };
+
   const resetData = () => {
     setSelectedCustomer('');
     setSelectedPart('');
@@ -205,6 +213,7 @@ const AddPlanningPage = ({
     setSelectedPartError('');
     setReleaseQuantityValueError('');
     setPlanningStatusError('');
+    setSelectedPartDescription('');
   };
 
   return (
@@ -235,9 +244,14 @@ const AddPlanningPage = ({
             placeholder="Select Part Number"
             error={selectedPartError}
             value={selectedPart}
-            handleChange={(value: string) => setSelectedPart(value)}
+            handleChange={onPartSelectEvent}
             required
           />
+          {selectedPartDescription && (
+            <div className="description-label-cs">
+              {selectedPartDescription}
+            </div>
+          )}
           <SosInputComponentType
             label="Release Quantity"
             value={releaseQuantityValue}

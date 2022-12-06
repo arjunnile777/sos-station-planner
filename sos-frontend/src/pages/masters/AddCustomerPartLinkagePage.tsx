@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Modal, Row, Space, Switch } from 'antd';
+import { Checkbox, Col, Modal, Row, Space, Switch } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import SosInputComponentType from '../../component/SosInputComponent';
@@ -56,8 +56,9 @@ const AddCustomerPartLinkagePage = ({
 
   const [customersListData, setCustomersListData] = useState([]);
   const [partsListData, setPartsListData] = useState([]);
-
+  const [selectedPartDescription, setSelectedPartDescription] = useState('');
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
+  const [isDuplicateAllow, setIsDuplicateAllow] = useState<boolean>(false);
   const [inputFieldsValues, setInputFieldsValues] = useState<InputFieldsType>({
     customerNameValue: '',
     partNameValue: '',
@@ -118,6 +119,8 @@ const AddCustomerPartLinkagePage = ({
         statusValue: updateModalData.status === 1 ? true : false,
       };
       setInputFieldsValues(fields);
+
+      setIsDuplicateAllow(updateModalData.duplicate_allow ? true : false);
     }
   }, []);
 
@@ -165,6 +168,7 @@ const AddCustomerPartLinkagePage = ({
         status: inputFieldsValues.statusValue ? 1 : 0,
         quantity: inputFieldsValues.packagingValue,
         customer_part_no: inputFieldsValues.customerPartNumberValue,
+        duplicate_allow: isDuplicateAllow,
       };
 
       if (isUpdateModal) {
@@ -261,13 +265,19 @@ const AddCustomerPartLinkagePage = ({
       packagingValueError: '',
       barcodeValueError: '',
     };
-
+    setSelectedPartDescription('');
     setInputFieldsValues(fieldsClear);
     setInputErrorFieldsValues(fieldsError);
   };
 
   const handleDropdownChange = (value: string, name: string) => {
-    console.log(`selected ${value}`);
+    if (name === 'partNameValue') {
+      const partN: any = partsListData.filter(
+        (item: any) => item.value == value,
+      );
+
+      setSelectedPartDescription(partN[0].part_description);
+    }
     setInputFieldsValues({
       ...inputFieldsValues,
       [name]: value,
@@ -317,6 +327,11 @@ const AddCustomerPartLinkagePage = ({
             }
             required
           />
+          {selectedPartDescription && (
+            <div className="description-label-cs">
+              {selectedPartDescription}
+            </div>
+          )}
           <SosInputComponentType
             label="Customer Part Number"
             required
@@ -352,6 +367,12 @@ const AddCustomerPartLinkagePage = ({
               onChange={onStatusChange}
             />
           </Space>
+          <Checkbox
+            value={isDuplicateAllow}
+            onChange={(e: any) => setIsDuplicateAllow(e.target.checked)}
+          >
+            Duplicate scan allowed ?
+          </Checkbox>
         </Col>
       </Row>
       {isSpinning ? <CustomSpinner /> : ''}

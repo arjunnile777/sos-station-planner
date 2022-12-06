@@ -24,6 +24,7 @@ import {
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import SosConfirmModal from '../../component/SosConfirmModal';
 import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
+import PageHeaderPage from '../../component/PageHeaderPage';
 
 interface StationMasterPageType {
   id: number;
@@ -307,15 +308,12 @@ const StationMasterPage = () => {
   return (
     <>
       <Row>
-        <Col span={24} style={{ textAlign: 'end', marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            ghost
-            icon={<PlusOutlined />}
-            onClick={() => setIsAddStationOpen(!isAddStationOpen)}
-          >
-            Add Station Master
-          </Button>
+        <Col span={24}>
+          <PageHeaderPage
+            title="Station Master"
+            btnLabel="Add Station Master"
+            onBtnClick={() => setIsAddStationOpen(!isAddStationOpen)}
+          />
         </Col>
         <Col span={24}>
           <Table

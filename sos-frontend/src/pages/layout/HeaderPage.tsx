@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { Menu, Layout, Avatar } from 'antd';
+import moment from 'moment';
 
 const { SubMenu } = Menu;
 
@@ -29,7 +30,16 @@ const HeaderPage = ({ collapsed = false }: HeaderPageType) => {
       className={`header-root ${collapsed && 'header-collapsed-root'}`}
       id="layoutHeader"
     >
-      <div></div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'end',
+          width: '100%',
+        }}
+      >
+        <span>{moment(new Date()).format('MMM DD YYYY')}</span>
+      </div>
       <div className="rightContainer">{rightContent}</div>
     </Layout.Header>
   );

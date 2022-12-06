@@ -9,7 +9,8 @@ export type EmployeeMastersAllType = {
 export type CreateEmployeeMasterType = {
   id?: number;
   name: string;
-  role: number;
+  role: string;
+  username: string;
   password: string;
   status: number;
   eid: string;

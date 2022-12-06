@@ -24,6 +24,7 @@ import {
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import SosConfirmModal from '../../component/SosConfirmModal';
 import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
+import PageHeaderPage from '../../component/PageHeaderPage';
 
 interface CustomerMasterPageType {
   id: number;
@@ -336,15 +337,12 @@ const CustomerMasterPage = () => {
   return (
     <>
       <Row>
-        <Col span={24} style={{ textAlign: 'end', marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            ghost
-            icon={<PlusOutlined />}
-            onClick={() => setIsAddCustomerOpen(!isAddCustomerOpen)}
-          >
-            Add Customer Master
-          </Button>
+        <Col span={24}>
+          <PageHeaderPage
+            title="Customer Master"
+            btnLabel="Add Customer Master"
+            onBtnClick={() => setIsAddCustomerOpen(!isAddCustomerOpen)}
+          />
         </Col>
         <Col span={24}>
           <Table

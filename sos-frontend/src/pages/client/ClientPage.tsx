@@ -10,6 +10,9 @@ import {
   PlanningSliceSelector,
 } from '../../store/slices/planning.slice';
 import CustomSpinner from '../../component/CustomSpinner';
+import PageHeaderPage from '../../component/PageHeaderPage';
+import { PopupMessagePage } from '../../component/PopupMessagePage';
+import { addClientApi, getAllClientApi } from '../../services/ClientApi';
 
 interface PlanningPageType {
   customer_name: string;
@@ -29,14 +32,27 @@ const ClientPage = () => {
   );
   const [scannedOrderNumber, setScannedOrderNumber] = useState('');
   const [scannedPartBarcode, setScannedPartBarcode] = useState('');
-  const [planningList, setPlanningList] = useState([]);
+  const [planningList, setPlanningList] = useState<any>([]);
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [isDisableBarcodeField, setIsDisableBarcodeField] =
     useState<boolean>(true);
+  const [isDisableOrderField, setIsDisableOrderField] =
+    useState<boolean>(false);
+  const [scannedOrdersList, setScannedOrdersList] = useState<any>([]);
 
   useEffect(() => {
     setPlanningList(individualPlanningData);
   }, [individualPlanningData]);
+
+  useEffect(() => {
+    if (!isDisableBarcodeField) {
+      if (barcodeInputRef && barcodeInputRef.current) {
+        barcodeInputRef.current!.focus({
+          cursor: 'start',
+        });
+      }
+    }
+  }, [isDisableBarcodeField]);
 
   // Set Spinner
   useEffect(() => {
@@ -49,11 +65,6 @@ const ClientPage = () => {
         cursor: 'start',
       });
     }
-    // if (barcodeInputRef && barcodeInputRef.current) {
-    //   barcodeInputRef.current!.focus({
-    //     cursor: 'start',
-    //   });
-    // }
   }, []);
 
   const columns: ColumnsType<PlanningPageType> = [
@@ -92,23 +103,82 @@ const ClientPage = () => {
     },
     {
       title: 'Scanned Order Barcode',
-      dataIndex: 'scanned_barcode',
-      key: 'scanned_barcode',
+      dataIndex: 'barcode',
+      key: 'barcode',
     },
   ];
 
   const onChangeOrderNumber = (e: any) => {
     setScannedOrderNumber(e.target.value);
     dispatch(getPlanningByOrderNo({ order_number: e.target.value }));
+    setIsDisableOrderField(true);
+    setIsDisableBarcodeField(false);
   };
 
-  const onChangePartBarcode = (e: any) => {
+  const onChangePartBarcode = async (e: any) => {
     setScannedPartBarcode(e.target.value);
+    let custNumber: any = '';
+    let partNumber: any = '';
+
+    if (planningList && planningList.length > 0) {
+      custNumber = planningList[0].customer_id;
+      partNumber = planningList[0].part_no;
+    }
+
+    const params: any = {
+      barcode: e.target.value,
+      customer_id: custNumber,
+      part_no: partNumber,
+    };
+
+    try {
+      setIsSpinning(true);
+      const response = await addClientApi(params);
+      if (response && response.data) {
+        handleSuccessResponse(response.data);
+      }
+    } catch (e) {
+      setIsSpinning(false);
+    }
+  };
+
+  const handleSuccessResponse = (successResponse: any) => {
+    if (successResponse) {
+      PopupMessagePage({
+        title: successResponse.message,
+        type: 'success',
+      });
+      setScannedPartBarcode('');
+    } else {
+      PopupMessagePage({
+        title: successResponse.message,
+        type: 'warning',
+      });
+    }
+    setIsSpinning(false);
+    getScannedOrdersList();
+  };
+
+  const getScannedOrdersList = async () => {
+    try {
+      setIsSpinning(true);
+      const response = await getAllClientApi();
+      console.log('yoooooooo==', response);
+      if (response && response.data) {
+        setScannedOrdersList(response.data.data);
+        setIsSpinning(false);
+      }
+    } catch (e) {
+      setIsSpinning(false);
+    }
   };
 
   return (
     <>
       <Row>
+        <Col span={24}>
+          <PageHeaderPage title="Client" isBtnVisible={false} />
+        </Col>
         <Col span={24}>
           <Row>
             <Col span={24}>
@@ -117,13 +187,10 @@ const ClientPage = () => {
                 columns={columns}
                 dataSource={planningList}
                 bordered
-                pagination={{
-                  showSizeChanger: true,
-                  showQuickJumper: true,
-                }}
                 scroll={{
-                  y: 200,
+                  y: 100,
                 }}
+                pagination={false}
               />
             </Col>
           </Row>
@@ -138,6 +205,7 @@ const ClientPage = () => {
                   value={scannedOrderNumber}
                   name="scanOrderNumber"
                   onChange={onChangeOrderNumber}
+                  disabled={isDisableOrderField}
                   ref={orderInputRef}
                 />
               </div>
@@ -163,14 +231,10 @@ const ClientPage = () => {
                   <Table
                     className="sos-ant-table"
                     columns={columns1}
-                    dataSource={[]}
+                    dataSource={scannedOrdersList}
                     bordered
-                    pagination={{
-                      showSizeChanger: true,
-                      showQuickJumper: true,
-                    }}
                     scroll={{
-                      y: 200,
+                      y: 150,
                     }}
                   />
                 </Col>

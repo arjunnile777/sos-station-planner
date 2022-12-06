@@ -12,6 +12,7 @@ import {
   updateEmployeeMasteriApi,
 } from '../../services/EmployeeMasterApi';
 import { getAllEmployeeMasters } from '../../store/slices/employeeMaster.slice';
+import SearchableSelectPage from '../../component/SeachableSelectPage';
 
 type AddEmployeeMasterPageType = {
   isModalOpen: boolean;
@@ -23,8 +24,9 @@ type AddEmployeeMasterPageType = {
 type InputFieldsType = {
   nameValue: string;
   eidValue: string;
-  roleValue: number;
+  roleValue: string;
   passwordValue: string;
+  usernameValue: string;
   statusValue: boolean;
 };
 
@@ -32,6 +34,7 @@ type InputErrorFieldsType = {
   nameValueError: string;
   eidValueError: string;
   roleValueError: string;
+  usernameValueError: string;
   passwordValueError: string;
 };
 
@@ -46,7 +49,8 @@ const AddEmployeeMasterPage = ({
   const [inputFieldsValues, setInputFieldsValues] = useState<InputFieldsType>({
     nameValue: '',
     eidValue: '',
-    roleValue: 0,
+    roleValue: '',
+    usernameValue: '',
     passwordValue: '',
     statusValue: true,
   });
@@ -56,6 +60,7 @@ const AddEmployeeMasterPage = ({
       nameValueError: '',
       eidValueError: '',
       roleValueError: '',
+      usernameValueError: '',
       passwordValueError: '',
     });
 
@@ -66,6 +71,7 @@ const AddEmployeeMasterPage = ({
         eidValue: updateModalData.eid,
         roleValue: updateModalData.role,
         passwordValue: updateModalData.password,
+        usernameValue: updateModalData.username,
         statusValue: updateModalData.status === 1 ? true : false,
       };
       setInputFieldsValues(fields);
@@ -84,6 +90,13 @@ const AddEmployeeMasterPage = ({
     });
   };
 
+  const onChangeRole = (role: string) => {
+    setInputFieldsValues({
+      ...inputFieldsValues,
+      roleValue: role,
+    });
+  };
+
   const onStatusChange = (checked: boolean) => {
     setInputFieldsValues({
       ...inputFieldsValues,
@@ -97,12 +110,14 @@ const AddEmployeeMasterPage = ({
       inputFieldsValues.nameValue &&
       inputFieldsValues.eidValue &&
       inputFieldsValues.roleValue &&
+      inputFieldsValues.usernameValue &&
       inputFieldsValues.passwordValue
     ) {
       const params: CreateEmployeeMasterType = {
         name: inputFieldsValues.nameValue,
         eid: inputFieldsValues.eidValue,
         role: inputFieldsValues.roleValue,
+        username: inputFieldsValues.usernameValue,
         password: inputFieldsValues.passwordValue,
         status: inputFieldsValues.statusValue ? 1 : 0,
       };
@@ -123,6 +138,9 @@ const AddEmployeeMasterPage = ({
 
       if (!inputFieldsValues.roleValue)
         fieldsObj.roleValueError = 'Role is required field';
+
+      if (!inputFieldsValues.usernameValue)
+        fieldsObj.usernameValueError = 'Username is required field';
 
       if (!inputFieldsValues.passwordValue)
         fieldsObj.passwordValueError = 'Password is required field';
@@ -181,7 +199,8 @@ const AddEmployeeMasterPage = ({
     const fieldsClear = {
       nameValue: '',
       eidValue: '',
-      roleValue: 0,
+      roleValue: '',
+      usernameValue: '',
       passwordValue: '',
       statusValue: false,
     };
@@ -190,6 +209,7 @@ const AddEmployeeMasterPage = ({
       nameValueError: '',
       eidValueError: '',
       roleValueError: '',
+      usernameValueError: '',
       passwordValueError: '',
     };
 
@@ -224,13 +244,40 @@ const AddEmployeeMasterPage = ({
             name="eidValue"
             onChange={onChangeInputChange}
           />
-
-          <SosInputComponentType
+          <SearchableSelectPage
+            optionsData={[
+              {
+                value: '1',
+                label: 'Operator',
+              },
+              {
+                value: '2',
+                label: 'Supervisor',
+              },
+            ]}
+            label="Role"
+            name="roleName"
+            placeholder="Select Status"
+            error={inputErrorFieldsValues.roleValueError}
+            value={inputFieldsValues.roleValue}
+            handleChange={(value: string) => onChangeRole(value)}
+            required
+            showSearch={false}
+          />
+          {/* <SosInputComponentType
             label="Employee Role"
             required
             value={inputFieldsValues.roleValue}
             error={inputErrorFieldsValues.roleValueError}
             name="roleValue"
+            onChange={onChangeInputChange}
+          /> */}
+          <SosInputComponentType
+            label="Username"
+            required
+            value={inputFieldsValues.usernameValue}
+            error={inputErrorFieldsValues.usernameValueError}
+            name="usernameValue"
             onChange={onChangeInputChange}
           />
           <SosInputComponentType

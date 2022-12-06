@@ -24,6 +24,7 @@ import {
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import SosConfirmModal from '../../component/SosConfirmModal';
 import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
+import PageHeaderPage from '../../component/PageHeaderPage';
 
 interface PartMasterPageType {
   id: number;
@@ -321,15 +322,12 @@ const PartMasterPage = () => {
   return (
     <>
       <Row>
-        <Col span={24} style={{ textAlign: 'end', marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            ghost
-            icon={<PlusOutlined />}
-            onClick={() => setIsAddPartOpen(!isAddPartOpen)}
-          >
-            Add Part Master
-          </Button>
+        <Col span={24}>
+          <PageHeaderPage
+            title="Part Master"
+            btnLabel="Add Part Master"
+            onBtnClick={() => setIsAddPartOpen(!isAddPartOpen)}
+          />
         </Col>
         <Col span={24}>
           <Table

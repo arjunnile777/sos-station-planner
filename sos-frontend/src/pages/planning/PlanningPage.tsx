@@ -18,6 +18,7 @@ import {
 import { DeletePlanningType } from '../../types/planning/planningPayloadType';
 import { deletePlanningApi } from '../../services/PlanningApi';
 import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
+import PageHeaderPage from '../../component/PageHeaderPage';
 
 const PLANNING_STATUS_ARRAY = ['Open', 'Hold', 'Dispatch'];
 
@@ -261,15 +262,12 @@ const PlanningPage = () => {
   return (
     <>
       <Row>
-        <Col span={24} style={{ textAlign: 'end', marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            ghost
-            icon={<PlusOutlined />}
-            onClick={() => setIsAddPlanningOpen(!isAddPlanningOpen)}
-          >
-            Add Planning
-          </Button>
+        <Col span={24}>
+          <PageHeaderPage
+            title="Planning"
+            btnLabel="Add Planning"
+            onBtnClick={() => setIsAddPlanningOpen(!isAddPlanningOpen)}
+          />
         </Col>
         <Col span={24}>
           <Table

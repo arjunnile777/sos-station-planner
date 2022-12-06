@@ -5,9 +5,9 @@ export type ClientAllType = {
 };
 
 export type CreateClientType = {
-  id?: number;
-  station_name: string;
-  status: number;
+  barcode: string;
+  customer_id?: string | number;
+  part_no: string | number;
 };
 
 export type DeleteClientType = {

@@ -16,6 +16,7 @@ export type CreateCustomerPartLinkageType = {
   barcode: string;
   quantity: string;
   customer_part_no: string;
+  duplicate_allow: boolean;
 };
 
 export type DeleteCustomerPartLinkageType = {

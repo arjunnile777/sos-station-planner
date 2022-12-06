@@ -24,6 +24,7 @@ import {
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import SosConfirmModal from '../../component/SosConfirmModal';
 import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
+import PageHeaderPage from '../../component/PageHeaderPage';
 
 interface CustomerPartLinkagePageType {
   id: number;
@@ -267,6 +268,7 @@ const CustomerPartLinkagePage = () => {
       status: status ? 1 : 0,
       quantity: record.quantity,
       customer_part_no: record.customer_part_no,
+      duplicate_allow: record.duplicate_allow ? true : false,
     };
 
     try {
@@ -341,17 +343,14 @@ const CustomerPartLinkagePage = () => {
   return (
     <>
       <Row>
-        <Col span={24} style={{ textAlign: 'end', marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            ghost
-            icon={<PlusOutlined />}
-            onClick={() =>
+        <Col span={24}>
+          <PageHeaderPage
+            title="Customer Part Linkage"
+            btnLabel="Add Customer Part Linkage"
+            onBtnClick={() =>
               setIsAddCustomerPartLinkageOpen(!isAddCustomerPartLinkageOpen)
             }
-          >
-            Add Part Master
-          </Button>
+          />
         </Col>
         <Col span={24}>
           <Table

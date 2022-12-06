@@ -50,7 +50,7 @@
             justify-content: center;
 
             img {
-                width: 36px;
+                width: 100px;
                 margin-right: 8px;
             }
 
@@ -75,6 +75,12 @@
                 -webkit-text-fill-color: transparent;
                 animation: fadeRightIn___2_LaH 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
                 animation-fill-mode: both;
+            }
+        }
+
+        .sos-logo-collapsed {
+            img {
+                width: 50px;
             }
         }
     }
@@ -378,4 +384,17 @@
     padding-bottom: 100px;
     padding-left: 100px;
     padding-right: 100px;
+}
+
+.description-label-cs {
+    font-size: 11px;
+    margin-bottom: 20px;
+    color: $primary-color;
+    font-weight: 600;
+}
+
+.page-header-label-cs {
+    font-size: 20px;
+    color: $primary-color;
+    font-weight: bold;
 }

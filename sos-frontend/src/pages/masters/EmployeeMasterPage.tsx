@@ -24,12 +24,14 @@ import {
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import SosConfirmModal from '../../component/SosConfirmModal';
 import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
+import PageHeaderPage from '../../component/PageHeaderPage';
 
+const ROLE_ARRAY = ['', 'Operator', 'Supervisor'];
 interface EmployeeMasterPageType {
   id: number;
   name: string;
   eid: string;
-  role: number;
+  role_name: number;
   password: number;
   status: number;
   created_on: string;
@@ -71,6 +73,7 @@ const EmployeeMasterPage = () => {
     if (employeeMasterData.length) {
       dataModify = employeeMasterData.map((item: any) => ({
         ...item,
+        role_name: ROLE_ARRAY[parseInt(item.role)],
         created_on: moment(item.created_on).format('DD-MM-YYYY'),
       }));
     }
@@ -180,9 +183,9 @@ const EmployeeMasterPage = () => {
     },
     {
       title: 'Role',
-      key: 'role',
-      dataIndex: 'role',
-      ...getColumnSearchProps('role'),
+      key: 'role_name',
+      dataIndex: 'role_name',
+      ...getColumnSearchProps('role_name'),
     },
     {
       title: 'Status',
@@ -253,6 +256,7 @@ const EmployeeMasterPage = () => {
       name: record.name,
       eid: record.eid,
       role: record.role,
+      username: record.username,
       password: record.password,
       status: status ? 1 : 0,
     };
@@ -329,15 +333,12 @@ const EmployeeMasterPage = () => {
   return (
     <>
       <Row>
-        <Col span={24} style={{ textAlign: 'end', marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            ghost
-            icon={<PlusOutlined />}
-            onClick={() => setIsAddEmployeeOpen(!isAddEmployeeOpen)}
-          >
-            Add Employee Master
-          </Button>
+        <Col span={24}>
+          <PageHeaderPage
+            title="Employee Master"
+            btnLabel="Add Employee Master"
+            onBtnClick={() => setIsAddEmployeeOpen(!isAddEmployeeOpen)}
+          />
         </Col>
         <Col span={24}>
           <Table

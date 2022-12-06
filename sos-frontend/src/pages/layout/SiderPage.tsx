@@ -113,9 +113,9 @@ const SiderPage = ({ collapsed = false, onCollapsed }: SiderPageType) => {
       collapsed={collapsed}
     >
       <div className="sos-logo-cs">
-        <div className="sos-logo">
-          <img alt="logo" src="/images/sos-logo.png" />
-          {collapsed ? '' : <h1>SOS</h1>}
+        <div className={`sos-logo ${collapsed ? "sos-logo-collapsed": ""}`}>
+          <img alt="logo" src="/images/sos-logo.jpeg" />
+          {/* {collapsed ? '' : <h1>SOS</h1>} */}
         </div>
       </div>
 
