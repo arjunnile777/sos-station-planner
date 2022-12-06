@@ -22,6 +22,7 @@ import CustomerPartLinkagePage from './pages/masters/CustomerPartLinkagePage';
 import EmployeeMasterPage from './pages/masters/EmployeeMasterPage';
 import PlanningPage from './pages/planning/PlanningPage';
 import ClientPage from './pages/client/ClientPage';
+import LoginPage from './pages/login/LoginPage';
 
 const App = () => {
   return (
@@ -47,6 +48,7 @@ const App = () => {
           <Route path={CLIENT_ROUTE} element={<ClientPage />} />
           <Route path={REPORTS_ROUTE} element={<CustomerMasterPage />} />
         </Route>
+        <Route path="/login" element={<LoginPage />}></Route>
       </Routes>
     </Router>
   );

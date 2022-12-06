@@ -5,9 +5,10 @@ import SosEllipsisIcon from './SosEllipsisIcon';
 type SosEllipsisDropdownType = {
   item: any;
   handleEditUser: () => void;
-  handleUpdateStatus: (status: boolean) => void;
+  handleUpdateStatus?: (status: boolean) => void;
   editLabel?: string;
   handleRemove: () => void;
+  isStatusVisible?: boolean;
 };
 
 const SosEllipsisDropdown = ({
@@ -16,6 +17,7 @@ const SosEllipsisDropdown = ({
   handleUpdateStatus,
   editLabel = 'EDIT USER',
   handleRemove,
+  isStatusVisible = true,
 }: SosEllipsisDropdownType) => {
   const [open, setOpen] = useState(false);
   const [isChecked, setIsChecked] = useState<boolean | undefined>(
@@ -24,7 +26,9 @@ const SosEllipsisDropdown = ({
 
   const updateStatus = () => {
     setIsChecked(!isChecked);
-    handleUpdateStatus(!isChecked);
+    if (isStatusVisible && handleUpdateStatus) {
+      handleUpdateStatus(!isChecked);
+    }
   };
 
   const handleMenuClick = (e: any) => {
@@ -45,32 +49,45 @@ const SosEllipsisDropdown = ({
     <Menu
       className="sos-ellipsis-dropdown-cs"
       onClick={e => handleMenuClick(e)}
-      items={[
-        {
-          label: editLabel,
-          key: 'edit',
-        },
-        {
-          label: 'Remove',
-          key: 'remove',
-        },
-        {
-          type: 'divider',
-        },
-        {
-          label: (
-            <>
-              <label>{isChecked ? 'Active' : 'Inactive'}</label>
-              <Switch
-                checked={isChecked}
-                size="small"
-                onChange={updateStatus}
-              />
-            </>
-          ),
-          key: 'status',
-        },
-      ]}
+      items={
+        isStatusVisible
+          ? [
+              {
+                label: editLabel,
+                key: 'edit',
+              },
+              {
+                label: 'Remove',
+                key: 'remove',
+              },
+              {
+                type: 'divider',
+              },
+              {
+                label: (
+                  <>
+                    <label>{isChecked ? 'Active' : 'Inactive'}</label>
+                    <Switch
+                      checked={isChecked}
+                      size="small"
+                      onChange={updateStatus}
+                    />
+                  </>
+                ),
+                key: 'status',
+              },
+            ]
+          : [
+              {
+                label: editLabel,
+                key: 'edit',
+              },
+              // {
+              //   label: 'Remove',
+              //   key: 'remove',
+              // },
+            ]
+      }
     />
   );
 

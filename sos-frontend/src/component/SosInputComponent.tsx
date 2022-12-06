@@ -10,6 +10,7 @@ type SosInputComponentType = {
   required?: boolean;
   placeholder?: string;
   error?: string;
+  disabled?: boolean;
 };
 
 const SosInputComponent = ({
@@ -21,6 +22,7 @@ const SosInputComponent = ({
   required = false,
   onChange,
   error = '',
+  disabled = false,
 }: SosInputComponentType) => {
   return (
     <div className="sos-input-cs">
@@ -37,6 +39,7 @@ const SosInputComponent = ({
         name={name}
         onChange={onChange}
         placeholder={placeholder}
+        disabled={disabled}
       />
       {error && <div className="sos-error-line">{`*${error}`}</div>}
     </div>

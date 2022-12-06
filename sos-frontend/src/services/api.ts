@@ -24,9 +24,7 @@ export const assignTokenToHeader = (
 
 http.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    // const accessToken = getAccessToken();
-    const accessToken =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFyanVubmlsZSIsInVzZXJJZCI6NCwiaWF0IjoxNjcwMzIzNjc0LCJleHAiOjE2NzA5Mjg0NzR9.Kyv3vSHtLwcIBTTlJ-yyNJh8lRWL_wzmPsbxhpTK54Y';
+    const accessToken = getAccessToken();
     return assignTokenToHeader(config, accessToken);
   },
   error => {

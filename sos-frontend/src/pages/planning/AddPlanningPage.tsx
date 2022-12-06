@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import SosInputComponentType from '../../component/SosInputComponent';
 import CustomSpinner from '../../component/CustomSpinner';
 import { PopupMessagePage } from '../../component/PopupMessagePage';
-import { CreatePlanningType } from '../../types/planning/planningPayloadType';
+import {
+  CreatePlanningType,
+  UpdatePlanningType,
+} from '../../types/planning/planningPayloadType';
 import {
   addPlanningiApi,
   updatePlanningiApi,
@@ -20,15 +23,15 @@ import {
 
 const PLANNING_STATUS = [
   {
-    value: '0',
+    value: 0,
     label: 'Open',
   },
   {
-    value: '1',
+    value: 1,
     label: 'Hold',
   },
   {
-    value: '2',
+    value: 2,
     label: 'Dispatch',
   },
 ];
@@ -60,7 +63,7 @@ const AddPlanningPage = ({
   const [releaseQuantityValue, setReleaseQuantityValue] = useState('');
   const [releaseQuantityValueError, setReleaseQuantityValueError] =
     useState('');
-  const [planningStatus, setPlanningStatus] = useState('0');
+  const [planningStatus, setPlanningStatus] = useState<number>(0);
   const [planningStatusError, setPlanningStatusError] = useState('');
   const [selectedPartDescription, setSelectedPartDescription] = useState('');
 
@@ -96,12 +99,11 @@ const AddPlanningPage = ({
   }, [partNumbersDropdownData]);
 
   useEffect(() => {
-    console.log('updateModalData==', updateModalData);
     console.log(isUpdateModal);
     if (isUpdateModal && updateModalData) {
       setSelectedCustomer(updateModalData.customer_id);
       setSelectedPart(updateModalData.part_id);
-      setReleaseQuantityValue(updateModalData.qty);
+      setReleaseQuantityValue(updateModalData.total_quantity);
       setPlanningStatus(updateModalData.status);
     }
   }, []);
@@ -129,20 +131,22 @@ const AddPlanningPage = ({
         (item: any) => item.value == selectedPart,
       );
 
-      const params: CreatePlanningType = {
-        customer_name: custN[0].name,
-        customer_id: selectedCustomer,
-        part_no: partN[0].part_no,
-        part_id: selectedPart,
-        scanned_quantity: '0',
-        total_quantity: releaseQuantityValue,
-        status: planningStatus,
-      };
-
       if (isUpdateModal) {
-        params.id = updateModalData.id;
+        const params: UpdatePlanningType = {
+          id: updateModalData.id,
+          status: planningStatus,
+        };
         handleUpdatePlanning(params);
       } else {
+        const params: CreatePlanningType = {
+          customer_name: custN[0].name,
+          customer_id: selectedCustomer,
+          part_no: partN[0].part_no,
+          part_id: selectedPart,
+          scanned_quantity: '0',
+          total_quantity: releaseQuantityValue,
+          status: planningStatus,
+        };
         handleAddPlanning(params);
       }
     } else {
@@ -167,7 +171,7 @@ const AddPlanningPage = ({
     }
   };
 
-  const handleUpdatePlanning = async (params: CreatePlanningType) => {
+  const handleUpdatePlanning = async (params: UpdatePlanningType) => {
     try {
       setIsSpinning(true);
       const response = await updatePlanningiApi(params);
@@ -208,7 +212,7 @@ const AddPlanningPage = ({
     setSelectedCustomer('');
     setSelectedPart('');
     setReleaseQuantityValue('');
-    setPlanningStatus('');
+    setPlanningStatus(0);
     setSelectedCustomerError('');
     setSelectedPartError('');
     setReleaseQuantityValueError('');
@@ -228,6 +232,7 @@ const AddPlanningPage = ({
         <Col span={3}></Col>
         <Col span={18}>
           <SearchableSelectPage
+            disable={isUpdateModal ? true : false}
             optionsData={customersListData}
             label="Select Customer"
             name="customerName"
@@ -238,6 +243,7 @@ const AddPlanningPage = ({
             required
           />
           <SearchableSelectPage
+            disable={isUpdateModal ? true : false}
             optionsData={partsListData}
             label="Select Part"
             name="partNameValue"
@@ -253,6 +259,7 @@ const AddPlanningPage = ({
             </div>
           )}
           <SosInputComponentType
+            disabled={isUpdateModal ? true : false}
             label="Release Quantity"
             value={releaseQuantityValue}
             error={releaseQuantityValueError}
@@ -268,7 +275,7 @@ const AddPlanningPage = ({
             placeholder="Select Status"
             error={planningStatusError}
             value={planningStatus}
-            handleChange={(value: string) => setPlanningStatus(value)}
+            handleChange={(value: number) => setPlanningStatus(value)}
             required
             showSearch={false}
           />

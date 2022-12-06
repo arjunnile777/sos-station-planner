@@ -7,10 +7,11 @@ type SearchableSelectPageType = {
   placeholder?: string;
   error?: string;
   label?: string;
-  value: string;
+  value: string | number;
   name?: string;
   showSearch?: boolean;
   handleChange: (value: any) => void;
+  disable?: boolean;
 };
 
 const SearchableSelectPage = ({
@@ -22,6 +23,7 @@ const SearchableSelectPage = ({
   name = '',
   value = '',
   showSearch = true,
+  disable = false,
   handleChange,
 }: SearchableSelectPageType) => {
   return (
@@ -45,6 +47,7 @@ const SearchableSelectPage = ({
         onChange={handleChange}
         value={value}
         options={optionsData}
+        disabled={disable}
       />
       {error && <div className="sos-error-line">{`*${error}`}</div>}
     </div>

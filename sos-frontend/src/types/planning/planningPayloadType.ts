@@ -12,7 +12,12 @@ export type CreatePlanningType = {
   part_id: string;
   scanned_quantity: string;
   total_quantity: string;
-  status: string;
+  status: number;
+};
+
+export type UpdatePlanningType = {
+  id?: number;
+  status: number;
 };
 
 export type DeletePlanningType = {

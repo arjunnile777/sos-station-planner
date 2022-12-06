@@ -190,6 +190,26 @@ const PlanningPage = () => {
       dataIndex: 'status_name',
       key: 'status_name',
     },
+    {
+      title: '',
+      render: (text: any, record: any) => (
+        <>
+          <div style={{ cursor: 'pointer' }}>
+            <SosEllipsisDropdown
+              isStatusVisible={false}
+              editLabel="Edit Part"
+              item={record}
+              handleEditUser={() => onHandleEditUser(record)}
+              handleRemove={() => onHandleRemove(record)}
+            />
+          </div>
+        </>
+      ),
+      dataIndex: 'btnEvent',
+      key: 'btnEvent',
+      width: '100px',
+      align: 'center',
+    },
   ];
 
   const onChangePagination = (pageInfo: any, filters: any) => {
