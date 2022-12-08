@@ -14,9 +14,9 @@ export const getAllCustomerListApi = () =>
 
 export const getAllPartListApi = () => http.get(`/part/getAllParts`);
 
-export const getTotalQuantityApi = (payload: any) =>
+export const getIndividualLinkageApi = (payload: any) =>
   http.get(
-    `/customer-part/getTotalQuantity/${payload.customer_id}/${payload.part_id}`,
+    `/customer-part/getIndividualLinkage/${payload.customer_id}/${payload.part_id}`,
   );
 
 export const addCustomerPartLinkageiApi = (

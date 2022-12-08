@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Col, Input, Row, Table } from 'antd';
+import { Button, Col, Input, Row, Table } from 'antd';
 import type { InputRef } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -12,8 +12,17 @@ import CustomSpinner from '../../component/CustomSpinner';
 import PageHeaderPage from '../../component/PageHeaderPage';
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import { addClientApi, getAllClientApi } from '../../services/ClientApi';
-import { UpdatePlanningScannedQuantityType } from '../../types/planning/planningPayloadType';
-import { updateScannedQuantityApi } from '../../services/PlanningApi';
+import {
+  UpdatePlanningScannedQuantityType,
+  UpdatePlanningType,
+} from '../../types/planning/planningPayloadType';
+import {
+  updatePlanningiApi,
+  updateScannedQuantityApi,
+} from '../../services/PlanningApi';
+import { useReactToPrint } from 'react-to-print';
+import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
+import SosNotificationModalPage from '../../component/SosNotificationModalPage';
 
 interface PlanningPageType {
   customer_name: string;
@@ -25,6 +34,8 @@ interface PlanningPageType {
 
 const ClientPage = () => {
   const dispatch = useDispatch();
+  const orderDetailsTableRef: any = useRef();
+  const scannedOrderTableRef: any = useRef();
   const orderInputRef = useRef<InputRef>(null);
   const barcodeInputRef = useRef<InputRef>(null);
 
@@ -40,30 +51,28 @@ const ClientPage = () => {
   const [isDisableOrderField, setIsDisableOrderField] =
     useState<boolean>(false);
   const [scannedOrdersList, setScannedOrdersList] = useState<any>([]);
+  const [linkageData, setLinkageData] = useState<any>();
+  const [orderCompletedModal, setOrderCompletedModal] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (individualPlanningData.length > 0) {
       const data: any = individualPlanningData;
       if (data[0].scanned_quantity == data[0].total_quantity) {
         // Order already completed.
-        PopupMessagePage({
-          title: 'This order has already completed.',
-          type: 'error',
-        });
+        setOrderCompletedModal(!orderCompletedModal);
       } else if (data[0].status == 1) {
         PopupMessagePage({
           title: 'Order on HOLD.',
           type: 'error',
         });
       } else if (data[0].status == 2) {
-        PopupMessagePage({
-          title: 'Order Invalid',
-          type: 'error',
-        });
+        setOrderCompletedModal(!orderCompletedModal);
       } else {
         setIsDisableOrderField(true);
         setIsDisableBarcodeField(false);
         setPlanningList(individualPlanningData);
+        getIndividualLinkageData(data[0]);
       }
     }
   }, [individualPlanningData]);
@@ -92,6 +101,30 @@ const ClientPage = () => {
   useEffect(() => {
     setIsSpinning(isPlanningLoading);
   }, [isPlanningLoading]);
+
+  const getIndividualLinkageData = async (data: any) => {
+    try {
+      const response = await getIndividualLinkageApi({
+        customer_id: data.customer_id,
+        part_id: data.part_id,
+      });
+      if (response && response.data) {
+        setLinkageData(response.data.data[0]);
+      }
+    } catch (e) {
+      console.log('error');
+    }
+  };
+
+  const handleOrderDetailsPrint = useReactToPrint({
+    content: () => orderDetailsTableRef.current,
+    // onBeforeGetContent: () => setprintHeaderVisible(true),
+  });
+
+  const handleScannedOrdersPrint = useReactToPrint({
+    content: () => scannedOrderTableRef.current,
+    // onBeforeGetContent: () => setprintHeaderVisible(true),
+  });
 
   const columns: ColumnsType<PlanningPageType> = [
     {
@@ -136,35 +169,66 @@ const ClientPage = () => {
 
   const onChangeOrderNumber = (e: any) => {
     setScannedOrderNumber(e.target.value);
-    dispatch(getPlanningByOrderNo({ order_number: e.target.value }));
+    if (e.target.value) {
+      dispatch(getPlanningByOrderNo({ order_number: e.target.value }));
+    }
   };
 
   const onChangePartBarcode = async (e: any) => {
     setScannedPartBarcode(e.target.value);
-    let custNumber: any = '';
-    let partNumber: any = '';
-    let orderNo: any = '';
-    if (planningList && planningList.length > 0) {
-      custNumber = planningList[0].customer_id;
-      partNumber = planningList[0].part_no;
-      orderNo = planningList[0].order_no;
-    }
+    if (e.target.value) {
+      if (
+        linkageData &&
+        linkageData.barcode &&
+        planningList[0].scanned_quantity < planningList[0].total_quantity
+      ) {
+        const regexStr = new RegExp(linkageData.barcode);
+        if (regexStr.test(e.target.value)) {
+          let custNumber: any = '';
+          let partNumber: any = '';
+          let orderNo: any = '';
+          if (planningList && planningList.length > 0) {
+            custNumber = planningList[0].customer_id;
+            partNumber = planningList[0].part_no;
+            orderNo = planningList[0].order_no;
+          }
 
-    const params: any = {
-      barcode: e.target.value,
-      customer_id: custNumber,
-      part_no: partNumber,
-      order_no: orderNo,
-    };
+          const params: any = {
+            barcode: e.target.value,
+            customer_id: custNumber,
+            part_no: partNumber,
+            order_no: orderNo,
+            isduplicate: linkageData.duplicate_allow,
+          };
 
-    try {
-      setIsSpinning(true);
-      const response = await addClientApi(params);
-      if (response && response.data) {
-        handleSuccessResponse(response.data);
+          console.log('Parameter to add scanned barcode');
+          try {
+            setIsSpinning(true);
+            const response = await addClientApi(params);
+            if (response && response.data) {
+              handleSuccessResponse(response.data);
+            }
+          } catch (e) {
+            setIsSpinning(false);
+          }
+        } else {
+          PopupMessagePage({
+            title: 'Invalid barcode',
+            type: 'error',
+          });
+        }
+      } else {
+        if (
+          planningList[0].scanned_quantity >= planningList[0].total_quantity
+        ) {
+          setOrderCompletedModal(!orderCompletedModal);
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try again',
+            type: 'error',
+          });
+        }
       }
-    } catch (e) {
-      setIsSpinning(false);
     }
   };
 
@@ -218,9 +282,35 @@ const ClientPage = () => {
       const response = await updateScannedQuantityApi(params);
       if (response && response.data) {
         console.log('Updated success');
+        if (planList.scanned_quantity === planList.total_quantity) {
+          updateOrderCompletePlanning(planList);
+        }
       }
     } catch (e) {
       console.log('Error');
+    }
+  };
+
+  const updateOrderCompletePlanning = async (planningList: any) => {
+    const params: UpdatePlanningType = {
+      id: planningList.id,
+      status: 2,
+    };
+
+    try {
+      setIsSpinning(true);
+      const response = await updatePlanningiApi(params);
+      if (response && response.data) {
+        setIsSpinning(false);
+        PopupMessagePage({
+          title: 'Your order has completed',
+          type: 'success',
+        });
+        onClientBtnClick();
+        handleScannedOrdersPrint();
+      }
+    } catch (e) {
+      setIsSpinning(false);
     }
   };
 
@@ -243,21 +333,24 @@ const ClientPage = () => {
             isBtnVisible={false}
             isClientBtnVisible={true}
             onClientBtnClick={onClientBtnClick}
+            // onClientPrintClick={handleOrderDetailsPrint}
           />
         </Col>
         <Col span={24}>
           <Row>
             <Col span={24}>
-              <Table
-                className="sos-ant-table"
-                columns={columns}
-                dataSource={planningList}
-                bordered
-                scroll={{
-                  y: 100,
-                }}
-                pagination={false}
-              />
+              <div ref={orderDetailsTableRef}>
+                <Table
+                  className="sos-ant-table"
+                  columns={columns}
+                  dataSource={planningList}
+                  bordered
+                  scroll={{
+                    y: 100,
+                  }}
+                  pagination={false}
+                />
+              </div>
             </Col>
           </Row>
           <br />
@@ -294,16 +387,28 @@ const ClientPage = () => {
               <Row>
                 <Col span={6}></Col>
                 <Col span={12}>
-                  <Table
-                    className="sos-ant-table"
-                    columns={columns1}
-                    dataSource={scannedOrdersList}
-                    bordered
-                    scroll={{
-                      y: 150,
-                    }}
-                    pagination={false}
-                  />
+                  <div ref={scannedOrderTableRef}>
+                    <Table
+                      className="sos-ant-table"
+                      columns={columns1}
+                      dataSource={scannedOrdersList}
+                      bordered
+                      scroll={{
+                        y: 150,
+                      }}
+                      pagination={false}
+                    />
+                  </div>
+                  {/* <div>
+                    <Button
+                      type="primary"
+                      ghost
+                      onClick={handleScannedOrdersPrint}
+                      style={{ float: 'right', marginTop: '20px' }}
+                    >
+                      Print Scanned Orders
+                    </Button>
+                  </div> */}
                 </Col>
               </Row>
             </Col>
@@ -311,6 +416,16 @@ const ClientPage = () => {
         </Col>
       </Row>
       {isSpinning ? <CustomSpinner /> : ''}
+      {orderCompletedModal && (
+        <SosNotificationModalPage
+          onResetPrintClick={() => console.log('clickkkkkkk')}
+          onCloseClick={() => setOrderCompletedModal(!orderCompletedModal)}
+          isModalOpen={orderCompletedModal}
+          title="Order has already completed"
+          descriptionText="Order has already completed. Do you want to reprint orders again."
+          okText="Reprint"
+        />
+      )}
     </>
   );
 };

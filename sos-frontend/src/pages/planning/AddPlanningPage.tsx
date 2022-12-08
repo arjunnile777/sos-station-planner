@@ -20,7 +20,7 @@ import {
   getAllCustomers,
   getAllPartNumbers,
 } from '../../store/slices/customerPartLinkage.slice';
-import { getTotalQuantityApi } from '../../services/CustomerPartLinkageApi';
+import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
 
 const PLANNING_STATUS = [
   {
@@ -140,7 +140,7 @@ const AddPlanningPage = ({
         handleUpdatePlanning(params);
       } else {
         try {
-          const response = await getTotalQuantityApi({
+          const response = await getIndividualLinkageApi({
             customer_id: selectedCustomer,
             part_id: selectedPart,
           });

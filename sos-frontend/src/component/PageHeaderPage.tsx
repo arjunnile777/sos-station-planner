@@ -8,6 +8,7 @@ type PageHeaderPageType = {
   isBtnVisible?: boolean;
   isClientBtnVisible?: boolean;
   onClientBtnClick?: () => void;
+  onClientPrintClick?: () => void;
 };
 
 const PageHeaderPage = ({
@@ -15,6 +16,7 @@ const PageHeaderPage = ({
   btnLabel = '',
   onBtnClick,
   onClientBtnClick,
+  onClientPrintClick,
   isBtnVisible = true,
   isClientBtnVisible = false,
 }: PageHeaderPageType) => {
@@ -40,6 +42,13 @@ const PageHeaderPage = ({
           <Button type="primary" ghost onClick={onClientBtnClick}>
             Reset
           </Button>
+          {/* <Button
+            type="primary"
+            onClick={onClientPrintClick}
+            style={{ marginLeft: '20px' }}
+          >
+            Print
+          </Button> */}
         </Col>
       )}
     </Row>

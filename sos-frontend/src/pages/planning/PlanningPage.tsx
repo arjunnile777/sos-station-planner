@@ -52,7 +52,7 @@ const PlanningPage = () => {
   const [searchFilters, setSearchFilters] = useState({
     customer_name: '',
     part_number: '',
-    order_number: '',
+    order_no: '',
   });
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [selectedItemToDelete, setSelectedItemToDelete] = useState<any>();
@@ -221,7 +221,7 @@ const PlanningPage = () => {
     const searchFilt = {
       customer_name: filters.customer_name ? filters.customer_name[0] : '',
       part_number: filters.part_number ? filters.part_number[0] : '',
-      order_number: filters.order_number ? filters.order_number[0] : '',
+      order_no: filters.order_no ? filters.order_no[0] : '',
     };
     setSearchFilters(searchFilt);
     onApplyFilters(searchFilt, pageInfo.current, pageInfo.pageSize);
@@ -271,6 +271,7 @@ const PlanningPage = () => {
   };
 
   const onApplyFilters = (filters: any, page?: number, page_size?: number) => {
+    console.log(filters);
     const params = {
       ...filters,
       page: page ? page : currentPage,
