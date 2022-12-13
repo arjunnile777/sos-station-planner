@@ -175,9 +175,22 @@ const AddPlanningPage = ({
     try {
       setIsSpinning(true);
       const response = await addPlanningiApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -187,9 +200,22 @@ const AddPlanningPage = ({
     try {
       setIsSpinning(true);
       const response = await updatePlanningiApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -198,14 +224,14 @@ const AddPlanningPage = ({
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllPlannings());
       resetData();
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }

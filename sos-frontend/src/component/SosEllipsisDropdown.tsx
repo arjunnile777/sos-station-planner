@@ -24,6 +24,10 @@ const SosEllipsisDropdown = ({
     item.status === 1 ? true : false,
   );
 
+  useEffect(() => {
+    setIsChecked(item.status === 1 ? true : false);
+  }, [item.status]);
+
   const updateStatus = () => {
     setIsChecked(!isChecked);
     if (isStatusVisible && handleUpdateStatus) {

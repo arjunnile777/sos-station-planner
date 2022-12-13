@@ -255,7 +255,7 @@ const PlanningPage = () => {
     try {
       setIsSpinning(true);
       const response = await deletePlanningApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         PopupMessagePage({
           title: response.data.data,
           type: 'success',
@@ -264,7 +264,20 @@ const PlanningPage = () => {
         setDeleteModalVisible(false);
         setSelectedItemToDelete(null);
         dispatch(getAllPlannings());
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }

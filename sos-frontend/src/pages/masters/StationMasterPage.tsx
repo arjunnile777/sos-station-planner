@@ -239,9 +239,22 @@ const StationMasterPage = () => {
     try {
       setIsSpinning(true);
       const response = await updateStationMasteriApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -250,13 +263,13 @@ const StationMasterPage = () => {
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllStationMasters());
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }
@@ -281,7 +294,7 @@ const StationMasterPage = () => {
     try {
       setIsSpinning(true);
       const response = await deleteStationMasterApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         PopupMessagePage({
           title: response.data.data,
           type: 'success',
@@ -290,7 +303,20 @@ const StationMasterPage = () => {
         setDeleteModalVisible(false);
         setSelectedItemToDelete(null);
         dispatch(getAllStationMasters());
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -352,7 +378,7 @@ const StationMasterPage = () => {
         <SosConfirmModal
           visible={deleteModalVisible}
           title="Remove Station Master"
-          bodyText={`Are you sure you want to delete ${selectedItemToDelete.station_name}`}
+          bodyText={`Are you sure you want to delete station ${selectedItemToDelete.station_name}`}
           onConfirm={onConfirm}
         />
       )}

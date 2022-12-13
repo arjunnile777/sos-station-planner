@@ -253,9 +253,22 @@ const PartMasterPage = () => {
     try {
       setIsSpinning(true);
       const response = await updatePartMasteriApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -264,13 +277,13 @@ const PartMasterPage = () => {
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllPartMasters());
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }
@@ -295,7 +308,7 @@ const PartMasterPage = () => {
     try {
       setIsSpinning(true);
       const response = await deletePartMasterApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         PopupMessagePage({
           title: response.data.data,
           type: 'success',
@@ -304,7 +317,20 @@ const PartMasterPage = () => {
         setDeleteModalVisible(false);
         setSelectedItemToDelete(null);
         dispatch(getAllPartMasters());
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -366,7 +392,7 @@ const PartMasterPage = () => {
         <SosConfirmModal
           visible={deleteModalVisible}
           title="Remove Part Master"
-          bodyText={`Are you sure you want to delete ${selectedItemToDelete.part_no}`}
+          bodyText={`Are you sure you want to delete part ${selectedItemToDelete.part_no}?`}
           onConfirm={onConfirm}
         />
       )}

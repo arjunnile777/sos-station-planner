@@ -1,6 +1,11 @@
 export const ACCESS_TOKEN = 'sos-login-access-token';
+export const LOGIN_ROLE = 'sos-login-role';
+export const OPERATOR_LOGIN_ROLE = '1';
+export const SUPERVISOR_LOGIN_ROLE = '2';
+export const LOGIN_USER_DETAILS = 'login_user_details';
 
 // Routing constants.
+export const LOGIN_ROUTE = 'login';
 export const CUSTOMER_MASTER_ROUTE = 'customer-master';
 export const PART_MASTER_ROUTE = 'part-master';
 export const CUSTOMER_PART_LINKAGE_ROUTE = 'customer-part-linkage';
@@ -24,3 +29,8 @@ export const KEY_REPORTS = 'reports';
 export const TABLE_MAX_HEIGHT_OBJECT = {
   y: 400,
 };
+
+export const ROLE_ARRAY = ['', 'Operator', 'Supervisor'];
+
+export const MOBILE_NUMBER_REGEX = /^(\+\d{1,3}[- ]?)?\d{10}$/;
+export const NUMBER_ONLY_REGEX = /^[0-9]*$/;

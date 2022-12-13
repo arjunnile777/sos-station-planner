@@ -26,6 +26,7 @@ import {
   PLANNING_ROUTE,
   REPORTS_ROUTE,
   STATION_MASTER_ROUTE,
+  SUPERVISOR_LOGIN_ROLE,
 } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 
@@ -46,7 +47,7 @@ function getItem(
   } as MenuItem;
 }
 
-const items: MenuItem[] = [
+const supervisor_items: MenuItem[] = [
   getItem('Master', 'master', <UserAddOutlined />, [
     getItem('Customer Master', KEY_CUSTOMER_MASTER, <UserOutlined />),
     getItem('Part Master', KEY_PART_MASTER, <UserOutlined />),
@@ -63,12 +64,21 @@ const items: MenuItem[] = [
   getItem('Reports', KEY_REPORTS, <FileAddOutlined />),
 ];
 
+const operator_items: MenuItem[] = [
+  getItem('Client', KEY_CLIENT, <UserOutlined />),
+];
+
 type SiderPageType = {
   collapsed: boolean;
+  loginRole: string;
   onCollapsed: () => void;
 };
 
-const SiderPage = ({ collapsed = false, onCollapsed }: SiderPageType) => {
+const SiderPage = ({
+  collapsed = false,
+  onCollapsed,
+  loginRole,
+}: SiderPageType) => {
   const navigate = useNavigate();
   const onSelectMenu = (selectedMenu: any) => {
     switch (selectedMenu.key) {
@@ -92,6 +102,7 @@ const SiderPage = ({ collapsed = false, onCollapsed }: SiderPageType) => {
         break;
       case KEY_CLIENT:
         navigate(`/${CLIENT_ROUTE}`);
+        navigate(0);
         break;
       case KEY_REPORTS:
         navigate(`/${REPORTS_ROUTE}`);
@@ -113,7 +124,7 @@ const SiderPage = ({ collapsed = false, onCollapsed }: SiderPageType) => {
       collapsed={collapsed}
     >
       <div className="sos-logo-cs">
-        <div className={`sos-logo ${collapsed ? "sos-logo-collapsed": ""}`}>
+        <div className={`sos-logo ${collapsed ? 'sos-logo-collapsed' : ''}`}>
           <img alt="logo" src="/images/sos-logo.jpeg" />
           {/* {collapsed ? '' : <h1>SOS</h1>} */}
         </div>
@@ -124,7 +135,11 @@ const SiderPage = ({ collapsed = false, onCollapsed }: SiderPageType) => {
           theme="dark"
           defaultSelectedKeys={['1']}
           mode="inline"
-          items={items}
+          items={
+            loginRole === SUPERVISOR_LOGIN_ROLE
+              ? supervisor_items
+              : operator_items
+          }
           onClick={onSelectMenu}
         />
       </div>

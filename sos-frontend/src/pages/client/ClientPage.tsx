@@ -156,8 +156,8 @@ const ClientPage = () => {
   const columns1: ColumnsType<PlanningPageType> = [
     {
       title: 'S.No',
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'index_id',
+      key: 'index_id',
       width: '100px',
     },
     {
@@ -205,9 +205,23 @@ const ClientPage = () => {
           try {
             setIsSpinning(true);
             const response = await addClientApi(params);
-            if (response && response.data) {
+            console.log('teee===', response);
+            if (response && response.status === 200 && response.data) {
               handleSuccessResponse(response.data);
+            } else {
+              if (response.data && response.data.msg) {
+                PopupMessagePage({
+                  title: response.data.msg,
+                  type: 'error',
+                });
+              } else {
+                PopupMessagePage({
+                  title: 'Something went wrong, Please try after sometime.',
+                  type: 'error',
+                });
+              }
             }
+            setIsSpinning(false);
           } catch (e) {
             setIsSpinning(false);
           }
@@ -235,13 +249,13 @@ const ClientPage = () => {
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       setScannedPartBarcode('');
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }
@@ -259,7 +273,11 @@ const ClientPage = () => {
       setIsSpinning(true);
       const response = await getAllClientApi({ order_no: orderNo });
       if (response && response.data) {
-        setScannedOrdersList(response.data.data);
+        const cData = response.data.data.map((item: any, index: number) => ({
+          ...item,
+          index_id: index,
+        }));
+        setScannedOrdersList(cData);
         setIsSpinning(false);
       }
     } catch (e) {
@@ -280,14 +298,26 @@ const ClientPage = () => {
     setPlanningList([{ ...planList }]);
     try {
       const response = await updateScannedQuantityApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         console.log('Updated success');
         if (planList.scanned_quantity === planList.total_quantity) {
           updateOrderCompletePlanning(planList);
         }
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
     } catch (e) {
-      console.log('Error');
+      console.log('Error=', e);
     }
   };
 
@@ -324,9 +354,28 @@ const ClientPage = () => {
     setIsDisableBarcodeField(true);
   };
 
+  const downloadTxtFile = () => {
+    const element = document.createElement('a');
+    const file = new Blob(
+      [
+        `CT~~CD,~CC^~CT~^XA^PW799^BY4,3,160^FT176,179^BCN,,Y,N^FD>:${'ABCDDD'}^FS^PQ1,0,1,Y^XZ`,
+      ],
+      {
+        type: 'text/plain',
+      },
+    );
+    element.href = URL.createObjectURL(file);
+    element.download = 'myFile.txt';
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  };
+
   return (
     <>
       <Row>
+        {/* <Col span={24}>
+          <Button onClick={downloadTxtFile}>Print</Button>
+        </Col> */}
         <Col span={24}>
           <PageHeaderPage
             title="Client"
@@ -385,8 +434,8 @@ const ClientPage = () => {
             </Col>
             <Col span={24}>
               <Row>
-                <Col span={6}></Col>
-                <Col span={12}>
+                <Col span={3}></Col>
+                <Col span={18}>
                   <div ref={scannedOrderTableRef}>
                     <Table
                       className="sos-ant-table"

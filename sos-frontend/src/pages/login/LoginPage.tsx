@@ -1,25 +1,53 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Modal, Row } from 'antd';
-
+import { Button, Col, Modal, Row, Space, Typography } from 'antd';
+import { CheckCircleOutlined } from '@ant-design/icons';
 import SosInputComponentType from '../../component/SosInputComponent';
 import CustomSpinner from '../../component/CustomSpinner';
 import { loginApi } from '../../services/LoginApi';
-import { useNavigate } from 'react-router-dom';
-import { setAccessToken } from '../../utils/localStorage';
-import { ACCESS_TOKEN } from '../../constants';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  setAccessToken,
+  setLoginRole,
+  setLoginUserDetails,
+} from '../../utils/localStorage';
+import {
+  ACCESS_TOKEN,
+  LOGIN_ROLE,
+  LOGIN_USER_DETAILS,
+  SUPERVISOR_LOGIN_ROLE,
+} from '../../constants';
+const { Text } = Typography;
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [usernameValue, setUsernameValue] = useState<string>('');
   const [passwordValue, setPasswordValue] = useState<string>('');
   const [usernameValueError, setUsernameValueError] = useState<string>('');
   const [passwordValueError, setPasswordValueError] = useState<string>('');
   const [commongLoginError, setCommongLoginError] = useState<string>('');
+  const [newRegisteredUser, setNewRegisteredUser] = useState<boolean>(false);
 
   useEffect(() => {
     localStorage.removeItem(ACCESS_TOKEN);
+    localStorage.removeItem(LOGIN_ROLE);
+    localStorage.removeItem(LOGIN_USER_DETAILS);
+    if (
+      searchParams &&
+      searchParams.get('new') &&
+      searchParams.get('new') == '1'
+    ) {
+      setNewRegisteredUser(true);
+    }
   }, []);
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === 'Enter') {
+      onLoginClick();
+    }
+  };
+
   const onLoginClick = async () => {
     if (usernameValue && passwordValue) {
       setCommongLoginError('');
@@ -34,11 +62,20 @@ const LoginPage = () => {
         const response = await loginApi(params);
         console.log('Login Response ==', response);
         if (response && response.data) {
+          setNewRegisteredUser(false);
           setUsernameValue('');
           setPasswordValue('');
           setIsSpinning(false);
           setAccessToken(response.data.token);
-          navigate('/');
+          setLoginUserDetails(JSON.stringify(response.data.user));
+          setLoginRole(response.data.user.role);
+          if (response.data.user.role === SUPERVISOR_LOGIN_ROLE) {
+            navigate('/');
+            navigate(0);
+          } else {
+            navigate('/client');
+            navigate(0);
+          }
         }
       } catch (e: any) {
         setCommongLoginError('Username or Password is incorrect.');
@@ -55,12 +92,24 @@ const LoginPage = () => {
       <Row className="sos-form-root-cs">
         <Col span={3}></Col>
         <Col span={18}>
+          {newRegisteredUser && (
+            <div style={{ marginBottom: '20px' }}>
+              <Text type="success">
+                <Space>
+                  <CheckCircleOutlined />
+                  You have successfully registered!
+                </Space>
+              </Text>
+            </div>
+          )}
+
           <SosInputComponentType
             label="Username"
             value={usernameValue}
             error={usernameValueError}
             name="username"
             onChange={e => setUsernameValue(e.target.value)}
+            onKeyDown={handleKeyDown}
             required
           />
           <SosInputComponentType
@@ -69,6 +118,7 @@ const LoginPage = () => {
             value={passwordValue}
             error={passwordValueError}
             name="password"
+            onKeyDown={handleKeyDown}
             onChange={e => setPasswordValue(e.target.value)}
             required
           />
@@ -84,6 +134,10 @@ const LoginPage = () => {
           >
             LOGIN
           </Button>
+          <div>
+            Do you want to register new user ?{' '}
+            <a href="/new-register">Click Here</a>
+          </div>
         </Col>
       </Row>
       {isSpinning ? <CustomSpinner /> : ''}

@@ -274,9 +274,22 @@ const CustomerPartLinkagePage = () => {
     try {
       setIsSpinning(true);
       const response = await updateCustomerPartLinkageiApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -285,13 +298,13 @@ const CustomerPartLinkagePage = () => {
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllCustomerPartLinkage());
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }
@@ -316,7 +329,7 @@ const CustomerPartLinkagePage = () => {
     try {
       setIsSpinning(true);
       const response = await deleteCustomerPartLinkageApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         PopupMessagePage({
           title: response.data.data,
           type: 'success',
@@ -325,7 +338,20 @@ const CustomerPartLinkagePage = () => {
         setDeleteModalVisible(false);
         setSelectedItemToDelete(null);
         dispatch(getAllCustomerPartLinkage());
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -389,7 +415,7 @@ const CustomerPartLinkagePage = () => {
         <SosConfirmModal
           visible={deleteModalVisible}
           title="Remove Customer Part Linkage"
-          bodyText={`Are you sure you want to delete ${selectedItemToDelete.customer_name}`}
+          bodyText={`Are you sure you want to delete linkage ${selectedItemToDelete.customer_name}?`}
           onConfirm={onConfirm}
         />
       )}

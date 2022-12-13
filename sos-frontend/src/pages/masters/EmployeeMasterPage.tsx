@@ -23,10 +23,9 @@ import {
 } from '../../services/EmployeeMasterApi';
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import SosConfirmModal from '../../component/SosConfirmModal';
-import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
+import { ROLE_ARRAY, TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
 import PageHeaderPage from '../../component/PageHeaderPage';
 
-const ROLE_ARRAY = ['', 'Operator', 'Supervisor'];
 interface EmployeeMasterPageType {
   id: number;
   name: string;
@@ -61,7 +60,6 @@ const EmployeeMasterPage = () => {
   });
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [selectedItemToDelete, setSelectedItemToDelete] = useState<any>();
-
   // When component render below code has called and fetch  GET ALL Part masters api.
   useEffect(() => {
     dispatch(getAllEmployeeMasters());
@@ -185,7 +183,6 @@ const EmployeeMasterPage = () => {
       title: 'Role',
       key: 'role_name',
       dataIndex: 'role_name',
-      ...getColumnSearchProps('role_name'),
     },
     {
       title: 'Status',
@@ -264,9 +261,22 @@ const EmployeeMasterPage = () => {
     try {
       setIsSpinning(true);
       const response = await updateEmployeeMasteriApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -275,13 +285,13 @@ const EmployeeMasterPage = () => {
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllEmployeeMasters());
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }
@@ -377,7 +387,7 @@ const EmployeeMasterPage = () => {
         <SosConfirmModal
           visible={deleteModalVisible}
           title="Remove Employee Master"
-          bodyText={`Are you sure you want to delete ${selectedItemToDelete.name}`}
+          bodyText={`Are you sure you want to delete employee ${selectedItemToDelete.name}?`}
           onConfirm={onConfirm}
         />
       )}

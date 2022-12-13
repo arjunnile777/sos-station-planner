@@ -11,6 +11,7 @@ type SosInputComponentType = {
   placeholder?: string;
   error?: string;
   disabled?: boolean;
+  onKeyDown?: (e: any) => void;
 };
 
 const SosInputComponent = ({
@@ -21,6 +22,7 @@ const SosInputComponent = ({
   placeholder,
   required = false,
   onChange,
+  onKeyDown,
   error = '',
   disabled = false,
 }: SosInputComponentType) => {
@@ -32,15 +34,31 @@ const SosInputComponent = ({
           {required && <span className="input-required-label">*</span>}
         </div>
       )}
-      <Input
-        required={required}
-        type={type}
-        value={value}
-        name={name}
-        onChange={onChange}
-        placeholder={placeholder}
-        disabled={disabled}
-      />
+
+      {type && type === 'password' ? (
+        <Input.Password
+          required={required}
+          type={type}
+          value={value}
+          name={name}
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+        />
+      ) : (
+        <Input
+          required={required}
+          type={type}
+          value={value}
+          name={name}
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+        />
+      )}
+
       {error && <div className="sos-error-line">{`*${error}`}</div>}
     </div>
   );

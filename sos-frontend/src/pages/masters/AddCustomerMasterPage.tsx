@@ -11,6 +11,7 @@ import CustomSpinner from '../../component/CustomSpinner';
 import { PopupMessagePage } from '../../component/PopupMessagePage';
 import { getAllCustomerMasters } from '../../store/slices/customerMaster.slice';
 import { useDispatch } from 'react-redux';
+import { MOBILE_NUMBER_REGEX } from '../../constants';
 
 type AddCustomerMasterPageType = {
   isModalOpen: boolean;
@@ -104,7 +105,8 @@ const AddCustomerMasterPage = ({
       inputFieldsValues.codeValue &&
       inputFieldsValues.contactPersonValue &&
       inputFieldsValues.addressValue &&
-      inputFieldsValues.phoneNumberValue
+      inputFieldsValues.phoneNumberValue &&
+      MOBILE_NUMBER_REGEX.test(inputFieldsValues.phoneNumberValue)
     ) {
       const params: CreateCustomerMasterType = {
         name: inputFieldsValues.nameValue,
@@ -137,6 +139,8 @@ const AddCustomerMasterPage = ({
 
       if (!inputFieldsValues.phoneNumberValue)
         fieldsObj.phoneNumberValueError = 'Phone Number is required field';
+      else if (!MOBILE_NUMBER_REGEX.test(inputFieldsValues.phoneNumberValue))
+        fieldsObj.phoneNumberValueError = 'Phone Number invalid';
 
       setInputErrorFieldsValues({
         ...fieldsObj,
@@ -148,9 +152,22 @@ const AddCustomerMasterPage = ({
     try {
       setIsSpinning(true);
       const response = await addCustomerMasteriApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -162,9 +179,22 @@ const AddCustomerMasterPage = ({
     try {
       setIsSpinning(true);
       const response = await updateCustomerMasteriApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -173,14 +203,14 @@ const AddCustomerMasterPage = ({
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllCustomerMasters());
       resetData();
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }

@@ -279,13 +279,13 @@ const CustomerMasterPage = () => {
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllCustomerMasters());
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }
@@ -310,7 +310,7 @@ const CustomerMasterPage = () => {
     try {
       setIsSpinning(true);
       const response = await deleteCustomerMasterApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         PopupMessagePage({
           title: response.data.data,
           type: 'success',
@@ -319,7 +319,20 @@ const CustomerMasterPage = () => {
         setDeleteModalVisible(false);
         setSelectedItemToDelete(null);
         dispatch(getAllCustomerMasters());
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -381,7 +394,7 @@ const CustomerMasterPage = () => {
         <SosConfirmModal
           visible={deleteModalVisible}
           title="Remove Customer Master"
-          bodyText={`Are you sure you want to delete ${selectedItemToDelete.name}`}
+          bodyText={`Are you sure you want to delete ${selectedItemToDelete.name}?`}
           onConfirm={onConfirm}
         />
       )}

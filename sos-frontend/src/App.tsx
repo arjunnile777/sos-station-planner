@@ -23,6 +23,8 @@ import EmployeeMasterPage from './pages/masters/EmployeeMasterPage';
 import PlanningPage from './pages/planning/PlanningPage';
 import ClientPage from './pages/client/ClientPage';
 import LoginPage from './pages/login/LoginPage';
+import ReportsPage from './pages/reports/ReportsPage';
+import NewRegisterPage from './pages/login/NewRegisterPage';
 
 const App = () => {
   return (
@@ -46,9 +48,11 @@ const App = () => {
           />
           <Route path={PLANNING_ROUTE} element={<PlanningPage />} />
           <Route path={CLIENT_ROUTE} element={<ClientPage />} />
-          <Route path={REPORTS_ROUTE} element={<CustomerMasterPage />} />
+          <Route path={REPORTS_ROUTE} element={<ReportsPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />}></Route>
+        <Route path="/new-register" element={<NewRegisterPage />}></Route>
+        <Route path="*" element={<LoginPage />} />
       </Routes>
     </Router>
   );

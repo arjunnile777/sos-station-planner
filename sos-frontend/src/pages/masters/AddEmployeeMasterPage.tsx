@@ -46,6 +46,7 @@ const AddEmployeeMasterPage = ({
 }: AddEmployeeMasterPageType) => {
   const dispatch = useDispatch();
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
+  const [errorInApiResponse, setErrorInApiResponse] = useState<string>('');
   const [inputFieldsValues, setInputFieldsValues] = useState<InputFieldsType>({
     nameValue: '',
     eidValue: '',
@@ -113,6 +114,7 @@ const AddEmployeeMasterPage = ({
       inputFieldsValues.usernameValue &&
       inputFieldsValues.passwordValue
     ) {
+      setErrorInApiResponse('');
       const params: CreateEmployeeMasterType = {
         name: inputFieldsValues.nameValue,
         eid: inputFieldsValues.eidValue,
@@ -155,10 +157,23 @@ const AddEmployeeMasterPage = ({
     try {
       setIsSpinning(true);
       const response = await addEmployeeMasteriApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
-    } catch (e) {
+      setIsSpinning(false);
+    } catch (e: any) {
       setIsSpinning(false);
     }
   };
@@ -169,9 +184,22 @@ const AddEmployeeMasterPage = ({
     try {
       setIsSpinning(true);
       const response = await updateEmployeeMasteriApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -180,14 +208,14 @@ const AddEmployeeMasterPage = ({
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllEmployeeMasters());
       resetData();
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }
@@ -282,6 +310,7 @@ const AddEmployeeMasterPage = ({
           />
           <SosInputComponentType
             label="Password"
+            type="password"
             required
             value={inputFieldsValues.passwordValue}
             error={inputErrorFieldsValues.passwordValueError}

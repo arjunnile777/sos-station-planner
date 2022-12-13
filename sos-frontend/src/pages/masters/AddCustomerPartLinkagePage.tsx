@@ -18,6 +18,7 @@ import {
   getAllPartNumbers,
 } from '../../store/slices/customerPartLinkage.slice';
 import SearchableSelectPage from '../../component/SeachableSelectPage';
+import { NUMBER_ONLY_REGEX } from '../../constants';
 
 type AddCustomerPartLinkagePageType = {
   isModalOpen: boolean;
@@ -149,6 +150,7 @@ const AddCustomerPartLinkagePage = ({
       inputFieldsValues.customerNameValue &&
       inputFieldsValues.partNameValue &&
       inputFieldsValues.packagingValue &&
+      NUMBER_ONLY_REGEX.test(inputFieldsValues.packagingValue) &&
       inputFieldsValues.customerPartNumberValue &&
       inputFieldsValues.barcodeValue
     ) {
@@ -187,7 +189,9 @@ const AddCustomerPartLinkagePage = ({
         fieldsObj.partNameValueError = 'Part name is required field';
 
       if (!inputFieldsValues.packagingValue)
-        fieldsObj.packagingValueError = 'PAckaging is required field';
+        fieldsObj.packagingValueError = 'Packaging is required field';
+      else if (!NUMBER_ONLY_REGEX.test(inputFieldsValues.packagingValue))
+        fieldsObj.packagingValueError = 'Invalid Packaging value entered.';
 
       if (!inputFieldsValues.customerPartNumberValue)
         fieldsObj.customerPartNumberValueError =
@@ -208,9 +212,22 @@ const AddCustomerPartLinkagePage = ({
     try {
       setIsSpinning(true);
       const response = await addCustomerPartLinkageiApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -222,9 +239,22 @@ const AddCustomerPartLinkagePage = ({
     try {
       setIsSpinning(true);
       const response = await updateCustomerPartLinkageiApi(params);
-      if (response && response.data) {
+      if (response && response.status === 200 && response.data) {
         handleSuccessResponse(response.data);
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
       }
+      setIsSpinning(false);
     } catch (e) {
       setIsSpinning(false);
     }
@@ -233,14 +263,14 @@ const AddCustomerPartLinkagePage = ({
   const handleSuccessResponse = (successResponse: any) => {
     if (successResponse) {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'success',
       });
       dispatch(getAllCustomerPartLinkage());
       resetData();
     } else {
       PopupMessagePage({
-        title: successResponse.message,
+        title: successResponse.msg,
         type: 'warning',
       });
     }
