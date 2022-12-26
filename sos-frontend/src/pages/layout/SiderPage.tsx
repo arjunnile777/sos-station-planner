@@ -56,7 +56,7 @@ const supervisor_items: MenuItem[] = [
       KEY_CUSTOMER_PART_LINKAGE,
       <UserOutlined />,
     ),
-    getItem('Station Master', KEY_STATION_MASTER, <UserOutlined />),
+    // getItem('Station Master', KEY_STATION_MASTER, <UserOutlined />),
     getItem('Employee Master', KEY_EMPLOYEE_MASTER, <UserOutlined />),
   ]),
   getItem('Planning', KEY_PLANNING, <LaptopOutlined />),

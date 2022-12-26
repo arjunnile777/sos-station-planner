@@ -8,6 +8,9 @@ import { http } from './api';
 export const getAllCustomerMasterApi = (payload?: CustomerMastersAllType) =>
   http.post(`/customer/getAll`, payload);
 
+export const getIndividualCustomerMasterApi = (payload: any) =>
+  http.get(`/customer/getById/${payload.customer_id}`);
+
 export const addCustomerMasteriApi = (payload: CreateCustomerMasterType) =>
   http.post(`/customer/create`, payload);
 

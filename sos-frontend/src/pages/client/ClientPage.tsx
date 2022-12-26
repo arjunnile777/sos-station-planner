@@ -11,7 +11,11 @@ import {
 import CustomSpinner from '../../component/CustomSpinner';
 import PageHeaderPage from '../../component/PageHeaderPage';
 import { PopupMessagePage } from '../../component/PopupMessagePage';
-import { addClientApi, getAllClientApi } from '../../services/ClientApi';
+import {
+  addClientApi,
+  getAllClientApi,
+  saveScannedDataApi,
+} from '../../services/ClientApi';
 import {
   UpdatePlanningScannedQuantityType,
   UpdatePlanningType,
@@ -20,9 +24,10 @@ import {
   updatePlanningiApi,
   updateScannedQuantityApi,
 } from '../../services/PlanningApi';
-import { useReactToPrint } from 'react-to-print';
 import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
 import SosNotificationModalPage from '../../component/SosNotificationModalPage';
+import { getIndividualCustomerMasterApi } from '../../services/CustomerMasterApi';
+import { getIndividualPartMasterApi } from '../../services/PartMasterApi';
 
 interface PlanningPageType {
   customer_name: string;
@@ -52,6 +57,8 @@ const ClientPage = () => {
     useState<boolean>(false);
   const [scannedOrdersList, setScannedOrdersList] = useState<any>([]);
   const [linkageData, setLinkageData] = useState<any>();
+  const [customerData, setCustomerData] = useState<any>();
+  const [partData, setPartData] = useState<any>();
   const [orderCompletedModal, setOrderCompletedModal] =
     useState<boolean>(false);
 
@@ -73,6 +80,8 @@ const ClientPage = () => {
         setIsDisableBarcodeField(false);
         setPlanningList(individualPlanningData);
         getIndividualLinkageData(data[0]);
+        getIndividualCustomerData(data[0]);
+        getIndividualPartData(data[0]);
       }
     }
   }, [individualPlanningData]);
@@ -116,15 +125,31 @@ const ClientPage = () => {
     }
   };
 
-  const handleOrderDetailsPrint = useReactToPrint({
-    content: () => orderDetailsTableRef.current,
-    // onBeforeGetContent: () => setprintHeaderVisible(true),
-  });
+  const getIndividualCustomerData = async (data: any) => {
+    try {
+      const response = await getIndividualCustomerMasterApi({
+        customer_id: data.customer_id,
+      });
+      if (response && response.data) {
+        setCustomerData(response.data.data[0]);
+      }
+    } catch (e) {
+      console.log('error');
+    }
+  };
 
-  const handleScannedOrdersPrint = useReactToPrint({
-    content: () => scannedOrderTableRef.current,
-    // onBeforeGetContent: () => setprintHeaderVisible(true),
-  });
+  const getIndividualPartData = async (data: any) => {
+    try {
+      const response = await getIndividualPartMasterApi({
+        customer_id: data.customer_id,
+      });
+      if (response && response.data) {
+        setPartData(response.data.data[0]);
+      }
+    } catch (e) {
+      console.log('error');
+    }
+  };
 
   const columns: ColumnsType<PlanningPageType> = [
     {
@@ -336,11 +361,58 @@ const ClientPage = () => {
           title: 'Your order has completed',
           type: 'success',
         });
-        onClientBtnClick();
-        handleScannedOrdersPrint();
+        requestForCreateXml();
       }
     } catch (e) {
       setIsSpinning(false);
+    }
+  };
+
+  const requestForCreateXml = async () => {
+    const dateVal = new Date();
+    const mm =
+      dateVal.getMonth() < 10
+        ? `0${dateVal.getMonth() + 1}`
+        : dateVal.getMonth() + 1;
+
+    const dd =
+      dateVal.getDate() < 10 ? `0${dateVal.getDate()}` : dateVal.getDate();
+
+    const date = `${dd}/${mm}/${dateVal.getFullYear()}`;
+
+    const params: any = {
+      order_no: planningList[0].order_no,
+      date: date,
+      scanned_qty: planningList[0].total_quantity,
+      total_qty: planningList[0].total_quantity,
+      part_no: planningList[0].part_no,
+      part_description: partData.part_description,
+      customer_part_no: linkageData.customer_part_no,
+      customer: planningList[0].customer_name,
+      address: customerData.address,
+      type: 'dispatch',
+    };
+
+    try {
+      const response = await saveScannedDataApi(params);
+      if (response && response.status === 200 && response.data) {
+        console.log('*************** File Saved successfully *********');
+        onClientBtnClick();
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
+      }
+    } catch (e) {
+      console.log('Error=', e);
     }
   };
 
@@ -354,28 +426,9 @@ const ClientPage = () => {
     setIsDisableBarcodeField(true);
   };
 
-  const downloadTxtFile = () => {
-    const element = document.createElement('a');
-    const file = new Blob(
-      [
-        `CT~~CD,~CC^~CT~^XA^PW799^BY4,3,160^FT176,179^BCN,,Y,N^FD>:${'ABCDDD'}^FS^PQ1,0,1,Y^XZ`,
-      ],
-      {
-        type: 'text/plain',
-      },
-    );
-    element.href = URL.createObjectURL(file);
-    element.download = 'myFile.txt';
-    document.body.appendChild(element); // Required for this to work in FireFox
-    element.click();
-  };
-
   return (
     <>
       <Row>
-        {/* <Col span={24}>
-          <Button onClick={downloadTxtFile}>Print</Button>
-        </Col> */}
         <Col span={24}>
           <PageHeaderPage
             title="Client"

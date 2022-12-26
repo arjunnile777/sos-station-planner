@@ -134,10 +134,10 @@ const LoginPage = () => {
           >
             LOGIN
           </Button>
-          <div>
+          {/* <div>
             Do you want to register new user ?{' '}
             <a href="/new-register">Click Here</a>
-          </div>
+          </div> */}
         </Col>
       </Row>
       {isSpinning ? <CustomSpinner /> : ''}

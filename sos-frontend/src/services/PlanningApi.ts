@@ -11,7 +11,7 @@ import { http } from './api';
 export const getAllPlanningApi = (payload?: PlanningAllType) =>
   http.post(`/planning/getAll`, payload);
 
-export const addPlanningiApi = (payload: CreatePlanningType) =>
+export const addPlanningiApi = (payload: any) =>
   http.post(`/planning/create`, payload);
 
 export const updatePlanningiApi = (payload: UpdatePlanningType) =>

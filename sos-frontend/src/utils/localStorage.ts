@@ -27,5 +27,7 @@ export const setLoginUserDetails = (value?: string) => {
 
 // GEt Selected LOGIN_USERDETAILS from localstorage
 export const getLoginUserDetails = () => {
-  return JSON.parse(localStorage.getItem(LOGIN_USER_DETAILS) || '');
+  if (localStorage.getItem(LOGIN_USER_DETAILS))
+    return JSON.parse(localStorage.getItem(LOGIN_USER_DETAILS) || '');
+  else window.location.href = '/login';
 };

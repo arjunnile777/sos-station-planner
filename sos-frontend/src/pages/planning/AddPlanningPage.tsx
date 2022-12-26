@@ -21,6 +21,9 @@ import {
   getAllPartNumbers,
 } from '../../store/slices/customerPartLinkage.slice';
 import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
+import { getIndividualCustomerMasterApi } from '../../services/CustomerMasterApi';
+import { getIndividualPartMasterApi } from '../../services/PartMasterApi';
+import { saveScannedDataApi } from '../../services/ClientApi';
 
 const PLANNING_STATUS = [
   {
@@ -67,10 +70,18 @@ const AddPlanningPage = ({
   const [planningStatus, setPlanningStatus] = useState<number>(0);
   const [planningStatusError, setPlanningStatusError] = useState('');
   const [selectedPartDescription, setSelectedPartDescription] = useState('');
+  const [linkageData, setLinkageData] = useState<any>();
+  const [customerData, setCustomerData] = useState<any>();
+  const [partData, setPartData] = useState<any>();
 
   useEffect(() => {
     dispatch(getAllCustomers());
     dispatch(getAllPartNumbers());
+    if (updateModalData) {
+      getIndividualLinkageData(updateModalData);
+      getIndividualCustomerData(updateModalData);
+      getIndividualPartData(updateModalData);
+    }
   }, []);
 
   useEffect(() => {
@@ -109,6 +120,46 @@ const AddPlanningPage = ({
     }
   }, []);
 
+  const getIndividualLinkageData = async (data: any) => {
+    try {
+      const response = await getIndividualLinkageApi({
+        customer_id: data.customer_id,
+        part_id: data.part_id,
+      });
+      if (response && response.data) {
+        setLinkageData(response.data.data[0]);
+      }
+    } catch (e) {
+      console.log('error');
+    }
+  };
+
+  const getIndividualCustomerData = async (data: any) => {
+    try {
+      const response = await getIndividualCustomerMasterApi({
+        customer_id: data.customer_id,
+      });
+      if (response && response.data) {
+        setCustomerData(response.data.data[0]);
+      }
+    } catch (e) {
+      console.log('error');
+    }
+  };
+
+  const getIndividualPartData = async (data: any) => {
+    try {
+      const response = await getIndividualPartMasterApi({
+        customer_id: data.customer_id,
+      });
+      if (response && response.data) {
+        setPartData(response.data.data[0]);
+      }
+    } catch (e) {
+      console.log('error');
+    }
+  };
+
   const handleCancel = () => {
     resetData();
     onCloseModal();
@@ -145,7 +196,7 @@ const AddPlanningPage = ({
             part_id: selectedPart,
           });
           if (response && response.data) {
-            const params: CreatePlanningType = {
+            const params: any = {
               customer_name: custN[0].name,
               customer_id: selectedCustomer,
               part_no: partN[0].part_no,
@@ -154,6 +205,9 @@ const AddPlanningPage = ({
               release_count: parseInt(releaseQuantityValue),
               total_quantity: response.data.data[0].quantity,
               status: planningStatus,
+              customer_part_no: response.data.data[0].customer_part_no,
+              address: custN[0].address,
+              part_description: partN[0].part_description,
             };
             handleAddPlanning(params);
           }
@@ -171,7 +225,7 @@ const AddPlanningPage = ({
     }
   };
 
-  const handleAddPlanning = async (params: CreatePlanningType) => {
+  const handleAddPlanning = async (params: any) => {
     try {
       setIsSpinning(true);
       const response = await addPlanningiApi(params);
@@ -201,6 +255,9 @@ const AddPlanningPage = ({
       setIsSpinning(true);
       const response = await updatePlanningiApi(params);
       if (response && response.status === 200 && response.data) {
+        if (params.status === 2) {
+          requestForCreateXml();
+        }
         handleSuccessResponse(response.data);
       } else {
         if (response.data && response.data.msg) {
@@ -244,6 +301,60 @@ const AddPlanningPage = ({
 
     setSelectedPartDescription(partN[0].part_description);
     setSelectedPart(value);
+
+    // if (selectedCustomer && value) {
+    //   getIndividualLinkageData({
+    //     customer_id: value,
+    //     part_id: selectedPart,
+    //   });
+    // }
+  };
+
+  const requestForCreateXml = async () => {
+    const dateVal = new Date();
+    const mm =
+      dateVal.getMonth() < 10
+        ? `0${dateVal.getMonth() + 1}`
+        : dateVal.getMonth() + 1;
+
+    const dd =
+      dateVal.getDate() < 10 ? `0${dateVal.getDate()}` : dateVal.getDate();
+
+    const date = `${dd}/${mm}/${dateVal.getFullYear()}`;
+
+    const params: any = {
+      order_no: updateModalData.order_no,
+      date: date,
+      scanned_qty: updateModalData.scanned_quantity,
+      total_qty: updateModalData.total_quantity,
+      part_no: updateModalData.part_no,
+      part_description: partData.part_description,
+      customer_part_no: linkageData.customer_part_no,
+      customer: updateModalData.customer_name,
+      address: customerData.address,
+      type: 'dispatch',
+    };
+
+    try {
+      const response = await saveScannedDataApi(params);
+      if (response && response.status === 200 && response.data) {
+        console.log('*************** File Saved successfully *********');
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
+      }
+    } catch (e) {
+      console.log('Error=', e);
+    }
   };
 
   const resetData = () => {
@@ -277,7 +388,15 @@ const AddPlanningPage = ({
             placeholder="Select Customer"
             error={selectedCustomerError}
             value={selectedCustomer}
-            handleChange={(value: string) => setSelectedCustomer(value)}
+            handleChange={(value: string) => {
+              setSelectedCustomer(value);
+              // if (selectedPart && value) {
+              //   getIndividualLinkageData({
+              //     customer_id: value,
+              //     part_id: selectedPart,
+              //   });
+              // }
+            }}
             required
           />
           <SearchableSelectPage
