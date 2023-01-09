@@ -19,6 +19,11 @@ import { DeletePlanningType } from '../../types/planning/planningPayloadType';
 import { deletePlanningApi } from '../../services/PlanningApi';
 import { TABLE_MAX_HEIGHT_OBJECT } from '../../constants';
 import PageHeaderPage from '../../component/PageHeaderPage';
+import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
+import { getIndividualCustomerMasterApi } from '../../services/CustomerMasterApi';
+import { getIndividualPartMasterApi } from '../../services/PartMasterApi';
+import { saveScannedDataApi } from '../../services/ClientApi';
+import { getLoginUserDetails } from '../../utils/localStorage';
 
 const PLANNING_STATUS_ARRAY = ['Open', 'Hold', 'Dispatch'];
 
@@ -197,10 +202,12 @@ const PlanningPage = () => {
           <div style={{ cursor: 'pointer' }}>
             <SosEllipsisDropdown
               isStatusVisible={false}
+              isReprintOption={true}
               editLabel="Edit Part"
               item={record}
               handleEditUser={() => onHandleEditUser(record)}
               handleRemove={() => onHandleRemove(record)}
+              handleReprint={() => onHandleReprintOrder(record)}
             />
           </div>
         </>
@@ -291,6 +298,104 @@ const PlanningPage = () => {
       page_size: page_size ? page_size : currentPageSize,
     };
     dispatch(getAllPlannings(params));
+  };
+
+  const onHandleReprintOrder = async (data: any) => {
+    let linkageCallData = null;
+    let customerCallData = null;
+    let partCallData = null;
+
+    console.log('************* Reprint *****************=', data);
+    try {
+      const response = await getIndividualLinkageApi({
+        customer_id: data.customer_id,
+        part_id: data.part_id,
+      });
+      console.log('Linkagessss data===', response);
+      if (response && response.data) {
+        linkageCallData = response.data.data[0];
+      }
+    } catch (e) {
+      console.log('error');
+    }
+
+    try {
+      const response = await getIndividualCustomerMasterApi({
+        customer_id: data.customer_id,
+        part_id: data.part_id,
+      });
+      console.log('customer data===', response);
+      if (response && response.data) {
+        customerCallData = response.data.data[0];
+      }
+    } catch (e) {
+      console.log('error');
+    }
+
+    try {
+      const response = await getIndividualPartMasterApi({
+        customer_id: data.customer_id,
+        part_id: data.part_id,
+      });
+      console.log('part data===', response);
+      if (response && response.data) {
+        partCallData = response.data.data[0];
+      }
+    } catch (e) {
+      console.log('error');
+    }
+
+    const loggedInUserDetails = getLoginUserDetails();
+    console.log('************* End  *****************');
+    const dateVal = new Date();
+    const mm =
+      dateVal.getMonth() < 10
+        ? `0${dateVal.getMonth() + 1}`
+        : dateVal.getMonth() + 1;
+
+    const dd =
+      dateVal.getDate() < 10 ? `0${dateVal.getDate()}` : dateVal.getDate();
+    const seconds = dateVal.getSeconds();
+    const minutes = dateVal.getMinutes();
+    const hour = dateVal.getHours();
+
+    const date = `${dd}/${mm}/${dateVal.getFullYear()} ${hour}:${minutes}:${seconds}`;
+
+    const params: any = {
+      order_no: data.order_no,
+      date: date,
+      scanned_qty: data.total_quantity,
+      total_qty: data.total_quantity,
+      part_no: data.part_no,
+      part_description: partCallData.part_description,
+      customer_part_no: linkageCallData.customer_part_no,
+      customer: data.customer_name,
+      address: customerCallData.address,
+      type: 'build',
+      login_user_name: loggedInUserDetails.name,
+    };
+
+    try {
+      const response = await saveScannedDataApi(params);
+      if (response && response.status === 200 && response.data) {
+        console.log('*************** File Saved successfully *********');
+        // onClientBtnClick();
+      } else {
+        if (response.data && response.data.msg) {
+          PopupMessagePage({
+            title: response.data.msg,
+            type: 'error',
+          });
+        } else {
+          PopupMessagePage({
+            title: 'Something went wrong, Please try after sometime.',
+            type: 'error',
+          });
+        }
+      }
+    } catch (e) {
+      console.log('Error=', e);
+    }
   };
 
   return (

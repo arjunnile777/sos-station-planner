@@ -292,6 +292,13 @@
     }
 }
 
+.sos-input-client-cs {
+    .input-label {
+        font-size: 20px;
+        font-weight: bold;
+    }
+}
+
 .sos-textarea-cs {
     .ant-input {
         background: $input-bgcolor;
@@ -421,4 +428,7 @@
     align-items: center;
     line-height: 50px;
     font-size: 18px;
+}
+
+.ant-message-notice-content {
 }

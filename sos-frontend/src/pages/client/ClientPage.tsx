@@ -28,6 +28,7 @@ import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
 import SosNotificationModalPage from '../../component/SosNotificationModalPage';
 import { getIndividualCustomerMasterApi } from '../../services/CustomerMasterApi';
 import { getIndividualPartMasterApi } from '../../services/PartMasterApi';
+import { getLoginUserDetails } from '../../utils/localStorage';
 
 interface PlanningPageType {
   customer_name: string;
@@ -85,6 +86,10 @@ const ClientPage = () => {
       }
     }
   }, [individualPlanningData]);
+
+  useEffect(() => {
+    if (planningList) getScannedOrdersList();
+  }, [planningList]);
 
   useEffect(() => {
     if (!isDisableBarcodeField) {
@@ -194,78 +199,90 @@ const ClientPage = () => {
 
   const onChangeOrderNumber = (e: any) => {
     setScannedOrderNumber(e.target.value);
-    if (e.target.value) {
-      dispatch(getPlanningByOrderNo({ order_number: e.target.value }));
+  };
+
+  const onEnterOrderNumberSubmit = (e: any) => {
+    if (e.key === 'Enter') {
+      if (e.target.value) {
+        dispatch(getPlanningByOrderNo({ order_number: e.target.value }));
+      }
     }
   };
 
-  const onChangePartBarcode = async (e: any) => {
+  const onChangePartBarcode = (e: any) => {
     setScannedPartBarcode(e.target.value);
-    if (e.target.value) {
-      if (
-        linkageData &&
-        linkageData.barcode &&
-        planningList[0].scanned_quantity < planningList[0].total_quantity
-      ) {
-        const regexStr = new RegExp(linkageData.barcode);
-        if (regexStr.test(e.target.value)) {
-          let custNumber: any = '';
-          let partNumber: any = '';
-          let orderNo: any = '';
-          if (planningList && planningList.length > 0) {
-            custNumber = planningList[0].customer_id;
-            partNumber = planningList[0].part_no;
-            orderNo = planningList[0].order_no;
-          }
+  };
 
-          const params: any = {
-            barcode: e.target.value,
-            customer_id: custNumber,
-            part_no: partNumber,
-            order_no: orderNo,
-            isduplicate: linkageData.duplicate_allow,
-          };
-
-          console.log('Parameter to add scanned barcode');
-          try {
-            setIsSpinning(true);
-            const response = await addClientApi(params);
-            console.log('teee===', response);
-            if (response && response.status === 200 && response.data) {
-              handleSuccessResponse(response.data);
-            } else {
-              if (response.data && response.data.msg) {
-                PopupMessagePage({
-                  title: response.data.msg,
-                  type: 'error',
-                });
-              } else {
-                PopupMessagePage({
-                  title: 'Something went wrong, Please try after sometime.',
-                  type: 'error',
-                });
-              }
-            }
-            setIsSpinning(false);
-          } catch (e) {
-            setIsSpinning(false);
-          }
-        } else {
-          PopupMessagePage({
-            title: 'Invalid barcode',
-            type: 'error',
-          });
-        }
-      } else {
+  const onEnterPartBarcodeSubmit = async (e: any) => {
+    if (e.key === 'Enter') {
+      if (e.target.value) {
         if (
-          planningList[0].scanned_quantity >= planningList[0].total_quantity
+          linkageData &&
+          linkageData.barcode &&
+          planningList[0].scanned_quantity < planningList[0].total_quantity
         ) {
-          setOrderCompletedModal(!orderCompletedModal);
+          const regexStr = new RegExp(linkageData.barcode);
+          if (regexStr.test(e.target.value)) {
+            let custNumber: any = '';
+            let partNumber: any = '';
+            let orderNo: any = '';
+            if (planningList && planningList.length > 0) {
+              custNumber = planningList[0].customer_id;
+              partNumber = planningList[0].part_no;
+              orderNo = planningList[0].order_no;
+            }
+
+            const params: any = {
+              barcode: e.target.value,
+              customer_id: custNumber,
+              part_no: partNumber,
+              order_no: orderNo,
+              isduplicate: linkageData.duplicate_allow,
+            };
+
+            console.log('Parameter to add scanned barcode');
+            try {
+              setIsSpinning(true);
+              const response = await addClientApi(params);
+              console.log('teee===', response);
+              if (response && response.status === 200 && response.data) {
+                handleSuccessResponse(response.data);
+              } else {
+                setScannedPartBarcode('');
+                if (response.data && response.data.msg) {
+                  PopupMessagePage({
+                    title: response.data.msg,
+                    type: 'error',
+                  });
+                } else {
+                  PopupMessagePage({
+                    title: 'Something went wrong, Please try after sometime.',
+                    type: 'error',
+                  });
+                }
+              }
+              setIsSpinning(false);
+            } catch (e) {
+              setIsSpinning(false);
+            }
+          } else {
+            setScannedPartBarcode('');
+            PopupMessagePage({
+              title: 'Invalid barcode',
+              type: 'error',
+            });
+          }
         } else {
-          PopupMessagePage({
-            title: 'Something went wrong, Please try again',
-            type: 'error',
-          });
+          if (
+            planningList[0].scanned_quantity >= planningList[0].total_quantity
+          ) {
+            setOrderCompletedModal(!orderCompletedModal);
+          } else {
+            PopupMessagePage({
+              title: 'Something went wrong, Please try again',
+              type: 'error',
+            });
+          }
         }
       }
     }
@@ -377,8 +394,12 @@ const ClientPage = () => {
 
     const dd =
       dateVal.getDate() < 10 ? `0${dateVal.getDate()}` : dateVal.getDate();
+    const seconds = dateVal.getSeconds();
+    const minutes = dateVal.getMinutes();
+    const hour = dateVal.getHours();
 
-    const date = `${dd}/${mm}/${dateVal.getFullYear()}`;
+    const date = `${dd}/${mm}/${dateVal.getFullYear()} ${hour}:${minutes}:${seconds}`;
+    const loggedInUserDetails = getLoginUserDetails();
 
     const params: any = {
       order_no: planningList[0].order_no,
@@ -391,13 +412,14 @@ const ClientPage = () => {
       customer: planningList[0].customer_name,
       address: customerData.address,
       type: 'dispatch',
+      login_user_name: loggedInUserDetails.name,
     };
 
     try {
       const response = await saveScannedDataApi(params);
       if (response && response.status === 200 && response.data) {
         console.log('*************** File Saved successfully *********');
-        onClientBtnClick();
+        // onClientBtnClick();
       } else {
         if (response.data && response.data.msg) {
           PopupMessagePage({
@@ -426,6 +448,24 @@ const ClientPage = () => {
     setIsDisableBarcodeField(true);
   };
 
+  const handleOrderDetailsPrint = () => {
+    console.log('Handle order details Print ==');
+    if (
+      planningList &&
+      planningList.length &&
+      partData &&
+      linkageData &&
+      customerData
+    ) {
+      requestForCreateXml();
+    } else {
+      PopupMessagePage({
+        title: 'Something went wrong, Please try after sometime.',
+        type: 'error',
+      });
+    }
+  };
+
   return (
     <>
       <Row>
@@ -435,7 +475,7 @@ const ClientPage = () => {
             isBtnVisible={false}
             isClientBtnVisible={true}
             onClientBtnClick={onClientBtnClick}
-            // onClientPrintClick={handleOrderDetailsPrint}
+            onClientPrintClick={handleOrderDetailsPrint}
           />
         </Col>
         <Col span={24}>
@@ -459,12 +499,13 @@ const ClientPage = () => {
           <br />
           <Row gutter={[16, 16]} className="scanner-fields-cs">
             <Col span={12}>
-              <div className="sos-input-cs">
+              <div className="sos-input-cs sos-input-client-cs">
                 <div className="input-label">Scan Order</div>
                 <Input
                   type="text"
                   value={scannedOrderNumber}
                   name="scanOrderNumber"
+                  onKeyDown={onEnterOrderNumberSubmit}
                   onChange={onChangeOrderNumber}
                   disabled={isDisableOrderField}
                   ref={orderInputRef}
@@ -472,12 +513,13 @@ const ClientPage = () => {
               </div>
             </Col>
             <Col span={12}>
-              <div className="sos-input-cs">
+              <div className="sos-input-cs sos-input-client-cs">
                 <div className="input-label">Scan Part Barcode</div>
                 <Input
                   type="text"
                   value={scannedPartBarcode}
                   name="scanBarcodeNumber"
+                  onKeyDown={onEnterPartBarcodeSubmit}
                   onChange={onChangePartBarcode}
                   ref={barcodeInputRef}
                   disabled={isDisableBarcodeField}
@@ -486,33 +528,18 @@ const ClientPage = () => {
               <br />
             </Col>
             <Col span={24}>
-              <Row>
-                <Col span={3}></Col>
-                <Col span={18}>
-                  <div ref={scannedOrderTableRef}>
-                    <Table
-                      className="sos-ant-table"
-                      columns={columns1}
-                      dataSource={scannedOrdersList}
-                      bordered
-                      scroll={{
-                        y: 150,
-                      }}
-                      pagination={false}
-                    />
-                  </div>
-                  {/* <div>
-                    <Button
-                      type="primary"
-                      ghost
-                      onClick={handleScannedOrdersPrint}
-                      style={{ float: 'right', marginTop: '20px' }}
-                    >
-                      Print Scanned Orders
-                    </Button>
-                  </div> */}
-                </Col>
-              </Row>
+              <div ref={scannedOrderTableRef}>
+                <Table
+                  className="sos-ant-table"
+                  columns={columns1}
+                  dataSource={scannedOrdersList}
+                  bordered
+                  scroll={{
+                    y: 150,
+                  }}
+                  pagination={false}
+                />
+              </div>
             </Col>
           </Row>
         </Col>

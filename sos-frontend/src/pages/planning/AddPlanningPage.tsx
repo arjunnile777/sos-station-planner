@@ -24,6 +24,7 @@ import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
 import { getIndividualCustomerMasterApi } from '../../services/CustomerMasterApi';
 import { getIndividualPartMasterApi } from '../../services/PartMasterApi';
 import { saveScannedDataApi } from '../../services/ClientApi';
+import { getLoginUserDetails } from '../../utils/localStorage';
 
 const PLANNING_STATUS = [
   {
@@ -319,8 +320,12 @@ const AddPlanningPage = ({
 
     const dd =
       dateVal.getDate() < 10 ? `0${dateVal.getDate()}` : dateVal.getDate();
+    const seconds = dateVal.getSeconds();
+    const minutes = dateVal.getMinutes();
+    const hour = dateVal.getHours();
 
-    const date = `${dd}/${mm}/${dateVal.getFullYear()}`;
+    const date = `${dd}/${mm}/${dateVal.getFullYear()} ${hour}:${minutes}:${seconds}`;
+    const loggedInUserDetails = getLoginUserDetails();
 
     const params: any = {
       order_no: updateModalData.order_no,
@@ -333,6 +338,7 @@ const AddPlanningPage = ({
       customer: updateModalData.customer_name,
       address: customerData.address,
       type: 'dispatch',
+      login_user_name: loggedInUserDetails.name,
     };
 
     try {

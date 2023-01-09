@@ -8,7 +8,9 @@ type SosEllipsisDropdownType = {
   handleUpdateStatus?: (status: boolean) => void;
   editLabel?: string;
   handleRemove: () => void;
+  handleReprint?: () => void;
   isStatusVisible?: boolean;
+  isReprintOption?: boolean;
 };
 
 const SosEllipsisDropdown = ({
@@ -17,7 +19,11 @@ const SosEllipsisDropdown = ({
   handleUpdateStatus,
   editLabel = 'EDIT USER',
   handleRemove,
+  handleReprint = () => {
+    console.log('reprint click');
+  },
   isStatusVisible = true,
+  isReprintOption = false,
 }: SosEllipsisDropdownType) => {
   const [open, setOpen] = useState(false);
   const [isChecked, setIsChecked] = useState<boolean | undefined>(
@@ -42,6 +48,9 @@ const SosEllipsisDropdown = ({
     }
     if (e.key === 'remove') {
       handleRemove();
+    }
+    if (e.key === 'reprint' && isReprintOption) {
+      handleReprint();
     }
   };
 
@@ -86,10 +95,14 @@ const SosEllipsisDropdown = ({
                 label: editLabel,
                 key: 'edit',
               },
-              // {
-              //   label: 'Remove',
-              //   key: 'remove',
-              // },
+              {
+                label: 'Remove',
+                key: 'remove',
+              },
+              {
+                label: 'Reprint',
+                key: 'reprint',
+              },
             ]
       }
     />

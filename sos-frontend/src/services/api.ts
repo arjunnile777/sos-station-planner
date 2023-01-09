@@ -16,7 +16,7 @@ enum StatusCode {
 }
 const TOKEN_EXPIRY_CODE = 'token_not_valid';
 const HOST_NAME = window.location.origin;
-//const HOST_NAME = 'http://localhost:4000';
+// const HOST_NAME = 'http://localhost:4000';
 const API_BASE_URL = `${HOST_NAME}/api`;
 
 export const http = axios.create({

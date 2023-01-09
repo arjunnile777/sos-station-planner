@@ -6,7 +6,7 @@ type PopupPageType = {
   duration?: number;
 };
 
-export const PopupMessagePage = ({
+export const PopupMessagePage = ({  
   title,
   type,
   duration = 3,
