@@ -1,4 +1,9 @@
-import { ACCESS_TOKEN, LOGIN_ROLE, LOGIN_USER_DETAILS } from '../constants';
+import {
+  ACCESS_TOKEN,
+  LOGIN_ROLE,
+  LOGIN_USER_DETAILS,
+  ORDER_STATUS_CHANGE,
+} from '../constants';
 
 // Set Selected ACCESS_TOKEN into localstorage
 export const setAccessToken = (value?: string) => {
@@ -20,14 +25,24 @@ export const getLoginRole = () => {
   return localStorage.getItem(LOGIN_ROLE) || '';
 };
 
-// Set Selected LOGIN_USERDETAILS into localstorage
+// Set Selected LOGIN_USERDETAILS into sessionStorage
 export const setLoginUserDetails = (value?: string) => {
-  localStorage.setItem(LOGIN_USER_DETAILS, value || '');
+  sessionStorage.setItem(LOGIN_USER_DETAILS, value || '');
 };
 
-// GEt Selected LOGIN_USERDETAILS from localstorage
+// GEt Selected LOGIN_USERDETAILS from sessionStorage
 export const getLoginUserDetails = () => {
-  if (localStorage.getItem(LOGIN_USER_DETAILS))
-    return JSON.parse(localStorage.getItem(LOGIN_USER_DETAILS) || '');
+  if (sessionStorage.getItem(LOGIN_USER_DETAILS))
+    return JSON.parse(sessionStorage.getItem(LOGIN_USER_DETAILS) || '');
   else window.location.href = '/login';
+};
+
+// Set dispatch event from planning page for client.
+export const setDispatchEvent = (value?: string) => {
+  localStorage.setItem(ORDER_STATUS_CHANGE, value || '');
+};
+
+// remove dispatch event from planning page for client.
+export const removeDispatchEvent = (value?: string) => {
+  localStorage.removeItem(ORDER_STATUS_CHANGE);
 };

@@ -161,6 +161,16 @@
                 background: $table-header-color;
                 font-weight: bold;
                 color: $white-color;
+                font-size: 18px;
+                transition: unset;
+            }
+        }
+    }
+    .ant-table-tbody {
+        tr {
+            td {
+                font-size: 18px;
+                transition: unset;
             }
         }
     }
@@ -241,7 +251,8 @@
         letter-spacing: 0.33px;
         color: #4b4b4b;
         text-transform: uppercase;
-        font-size: 11px;
+        font-size: 18px;
+        font-weight: bold;
         margin-bottom: 5px;
 
         .select-required-label {
@@ -279,7 +290,8 @@
         letter-spacing: 0.33px;
         color: $input-label-color;
         text-transform: uppercase;
-        font-size: 11px;
+        font-size: 18px;
+        font-weight: bold;
         margin-bottom: 5px;
 
         .input-required-label {
@@ -314,7 +326,8 @@
         letter-spacing: 0.33px;
         color: $input-label-color;
         text-transform: uppercase;
-        font-size: 11px;
+        font-size: 18px;
+        font-weight: bold;
         margin-bottom: 5px;
 
         .input-required-label {
@@ -332,7 +345,8 @@
         letter-spacing: 0.33px;
         color: $input-label-color;
         text-transform: uppercase;
-        font-size: 11px;
+        font-size: 18px;
+        font-weight: bold;
         margin-bottom: 5px;
     }
 
@@ -389,7 +403,7 @@
         .ant-modal-title {
             color: $white-color;
             font-weight: bold;
-
+            font-size: 20px;
             svg {
                 color: $white-color;
             }
@@ -417,18 +431,36 @@
 }
 
 .ant-message-notice-content {
-    min-width: 200px;
-    /* max-width: 600px; */
-    min-height: 100px;
-    padding: 20px;
-    /* display: flex; */
-    text-align: center;
-    justify-content: center;
-    vertical-align: middle;
-    align-items: center;
-    line-height: 50px;
-    font-size: 18px;
-}
-
-.ant-message-notice-content {
+    padding: unset;
+    .ant-message-custom-content {
+        min-width: 200px;
+        min-height: 100px;
+        padding: 20px;
+        text-align: center;
+        justify-content: center;
+        vertical-align: middle;
+        align-items: center;
+        line-height: 50px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #ffffff;
+    }
+    .ant-message-success {
+        background-color: #52c41a;
+        .anticon {
+            color: #ffffff;
+        }
+    }
+    .ant-message-error {
+        background-color: #ff4d4f;
+        .anticon {
+            color: #ffffff;
+        }
+    }
+    .ant-message-warning {
+        background-color: #faad14;
+        .anticon {
+            color: #ffffff;
+        }
+    }
 }

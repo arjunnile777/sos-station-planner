@@ -184,16 +184,19 @@ const PlanningPage = () => {
       title: 'Scanned Qty',
       dataIndex: 'scanned_quantity',
       key: 'scanned_quantity',
+      width: '120px',
     },
     {
       title: 'Total Qty',
       dataIndex: 'total_quantity',
       key: 'total_quantity',
+      width: '120px',
     },
     {
       title: 'Status',
       dataIndex: 'status_name',
       key: 'status_name',
+      width: '120px',
     },
     {
       title: '',

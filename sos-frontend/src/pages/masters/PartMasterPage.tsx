@@ -157,12 +157,12 @@ const PartMasterPage = () => {
   });
 
   const columns: ColumnsType<PartMasterPageType> = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      align: 'center',
-    },
+    // {
+    //   title: 'ID',
+    //   dataIndex: 'id',
+    //   key: 'id',
+    //   align: 'center',
+    // },
     {
       title: 'Part Number',
       dataIndex: 'part_no',

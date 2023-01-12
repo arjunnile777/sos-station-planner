@@ -161,12 +161,12 @@ const EmployeeMasterPage = () => {
   });
 
   const columns: ColumnsType<EmployeeMasterPageType> = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      align: 'center',
-    },
+    // {
+    //   title: 'ID',
+    //   dataIndex: 'id',
+    //   key: 'id',
+    //   align: 'center',
+    // },
     {
       title: 'Name',
       dataIndex: 'name',

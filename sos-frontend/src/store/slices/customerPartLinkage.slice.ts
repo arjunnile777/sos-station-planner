@@ -3,6 +3,8 @@ import {
   getAllCustomerListApi,
   getAllCustomerPartLinkageApi,
   getAllPartListApi,
+  getLinkageCustomersApi,
+  getLinkagePartsApi,
 } from '../../services/CustomerPartLinkageApi';
 import { CustomerPartLinkageAllType } from '../../types/customerPartLinkage/customerPartLinkagePayloadType';
 import { CustomerPartLinkageState } from '../../types/customerPartLinkage/customerPartLinkageState';
@@ -14,6 +16,8 @@ const initialState: CustomerPartLinkageState = {
   customersDropdownData: [],
   partNumbersDropdownData: [],
   totalCustomerPartLinkage: 0,
+  linkageCustomersDropdownData: [],
+  linkagePartNumbersDropdownData: [],
 };
 
 export const getAllCustomerPartLinkage: any = createAsyncThunk(
@@ -36,6 +40,22 @@ export const getAllPartNumbers: any = createAsyncThunk(
   'customerPartLinkage/getAllPartNumbers',
   async () => {
     const response = await getAllPartListApi();
+    return response.data;
+  },
+);
+
+export const getAllLinkageCustomers: any = createAsyncThunk(
+  'customerPartLinkage/getAllLinkageCustomers',
+  async () => {
+    const response = await getLinkageCustomersApi();
+    return response.data;
+  },
+);
+
+export const getAllLinkagePartNumbers: any = createAsyncThunk(
+  'customerPartLinkage/getAllLinkagePartNumbers',
+  async payload => {
+    const response = await getLinkagePartsApi(payload);
     return response.data;
   },
 );
@@ -106,6 +126,48 @@ export const CustomerPartLinkageSlice = createSlice({
       (state: CustomerPartLinkageState) => {
         state.isCustomerPartLinkageLoading = false;
         state.partNumbersDropdownData = [];
+      },
+    );
+
+    builder.addCase(
+      getAllLinkageCustomers.pending,
+      (state: CustomerPartLinkageState) => {
+        state.isCustomerPartLinkageLoading = true;
+      },
+    );
+    builder.addCase(
+      getAllLinkageCustomers.fulfilled,
+      (state: CustomerPartLinkageState, { payload }) => {
+        state.isCustomerPartLinkageLoading = false;
+        state.linkageCustomersDropdownData = payload.data;
+      },
+    );
+    builder.addCase(
+      getAllLinkageCustomers.rejected,
+      (state: CustomerPartLinkageState) => {
+        state.isCustomerPartLinkageLoading = false;
+        state.linkageCustomersDropdownData = [];
+      },
+    );
+
+    builder.addCase(
+      getAllLinkagePartNumbers.pending,
+      (state: CustomerPartLinkageState) => {
+        state.isCustomerPartLinkageLoading = true;
+      },
+    );
+    builder.addCase(
+      getAllLinkagePartNumbers.fulfilled,
+      (state: CustomerPartLinkageState, { payload }) => {
+        state.isCustomerPartLinkageLoading = false;
+        state.linkagePartNumbersDropdownData = payload.data;
+      },
+    );
+    builder.addCase(
+      getAllLinkagePartNumbers.rejected,
+      (state: CustomerPartLinkageState) => {
+        state.isCustomerPartLinkageLoading = false;
+        state.linkagePartNumbersDropdownData = [];
       },
     );
   },

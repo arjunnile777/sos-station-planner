@@ -3,5 +3,7 @@ export type CustomerPartLinkageState = {
   customerPartLinkageData: [];
   customersDropdownData: [];
   partNumbersDropdownData: [];
+  linkageCustomersDropdownData: [];
+  linkagePartNumbersDropdownData: [];
   totalCustomerPartLinkage: number;
 };

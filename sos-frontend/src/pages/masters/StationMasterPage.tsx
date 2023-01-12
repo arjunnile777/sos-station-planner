@@ -156,12 +156,12 @@ const StationMasterPage = () => {
   });
 
   const columns: ColumnsType<StationMasterPageType> = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      align: 'center',
-    },
+    // {
+    //   title: 'ID',
+    //   dataIndex: 'id',
+    //   key: 'id',
+    //   align: 'center',
+    // },
     {
       title: 'Name',
       dataIndex: 'station_name',

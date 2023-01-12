@@ -28,7 +28,11 @@ import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
 import SosNotificationModalPage from '../../component/SosNotificationModalPage';
 import { getIndividualCustomerMasterApi } from '../../services/CustomerMasterApi';
 import { getIndividualPartMasterApi } from '../../services/PartMasterApi';
-import { getLoginUserDetails } from '../../utils/localStorage';
+import {
+  getLoginUserDetails,
+  removeDispatchEvent,
+} from '../../utils/localStorage';
+import { ORDER_STATUS_CHANGE } from '../../constants';
 
 interface PlanningPageType {
   customer_name: string;
@@ -64,6 +68,22 @@ const ClientPage = () => {
     useState<boolean>(false);
 
   useEffect(() => {
+    window.addEventListener('storage', onStorageUpdate);
+    return () => {
+      window.removeEventListener('storage', onStorageUpdate);
+    };
+  }, []);
+
+  const onStorageUpdate = (e: any) => {
+    const { key } = e;
+    if (key === ORDER_STATUS_CHANGE) {
+      removeDispatchEvent();
+      onClientBtnClick();
+    }
+  };
+
+  useEffect(() => {
+    console.log('Individuallll===', individualPlanningData);
     if (individualPlanningData.length > 0) {
       const data: any = individualPlanningData;
       if (data[0].scanned_quantity == data[0].total_quantity) {
@@ -79,11 +99,11 @@ const ClientPage = () => {
       } else {
         setIsDisableOrderField(true);
         setIsDisableBarcodeField(false);
-        setPlanningList(individualPlanningData);
-        getIndividualLinkageData(data[0]);
-        getIndividualCustomerData(data[0]);
-        getIndividualPartData(data[0]);
       }
+      setPlanningList(individualPlanningData);
+      getIndividualLinkageData(data[0]);
+      getIndividualCustomerData(data[0]);
+      getIndividualPartData(data[0]);
     }
   }, [individualPlanningData]);
 
@@ -176,11 +196,13 @@ const ClientPage = () => {
       title: 'Scanned Count',
       dataIndex: 'scanned_quantity',
       key: 'scanned_quantity',
+      width: '120px',
     },
     {
       title: 'Total Qty',
       dataIndex: 'total_quantity',
       key: 'total_quantity',
+      width: '120px',
     },
   ];
   const columns1: ColumnsType<PlanningPageType> = [
@@ -268,7 +290,8 @@ const ClientPage = () => {
           } else {
             setScannedPartBarcode('');
             PopupMessagePage({
-              title: 'Invalid barcode',
+              title:
+                'Entered barcode seems invalid, please try with correct barcode.',
               type: 'error',
             });
           }
@@ -317,7 +340,7 @@ const ClientPage = () => {
       if (response && response.data) {
         const cData = response.data.data.map((item: any, index: number) => ({
           ...item,
-          index_id: index,
+          index_id: index + 1,
         }));
         setScannedOrdersList(cData);
         setIsSpinning(false);
@@ -375,7 +398,7 @@ const ClientPage = () => {
       if (response && response.data) {
         setIsSpinning(false);
         PopupMessagePage({
-          title: 'Your order has completed',
+          title: 'Your order has completed.',
           type: 'success',
         });
         requestForCreateXml();
@@ -419,7 +442,7 @@ const ClientPage = () => {
       const response = await saveScannedDataApi(params);
       if (response && response.status === 200 && response.data) {
         console.log('*************** File Saved successfully *********');
-        // onClientBtnClick();
+        onClientBtnClick();
       } else {
         if (response.data && response.data.msg) {
           PopupMessagePage({
@@ -457,6 +480,7 @@ const ClientPage = () => {
       linkageData &&
       customerData
     ) {
+      setOrderCompletedModal(!orderCompletedModal);
       requestForCreateXml();
     } else {
       PopupMessagePage({
@@ -487,9 +511,9 @@ const ClientPage = () => {
                   columns={columns}
                   dataSource={planningList}
                   bordered
-                  scroll={{
-                    y: 100,
-                  }}
+                  // scroll={{
+                  //   y: 100,
+                  // }}
                   pagination={false}
                 />
               </div>
@@ -534,9 +558,9 @@ const ClientPage = () => {
                   columns={columns1}
                   dataSource={scannedOrdersList}
                   bordered
-                  scroll={{
-                    y: 150,
-                  }}
+                  // scroll={{
+                  //   y: 150,
+                  // }}
                   pagination={false}
                 />
               </div>
@@ -547,7 +571,7 @@ const ClientPage = () => {
       {isSpinning ? <CustomSpinner /> : ''}
       {orderCompletedModal && (
         <SosNotificationModalPage
-          onResetPrintClick={() => console.log('clickkkkkkk')}
+          onResetPrintClick={handleOrderDetailsPrint}
           onCloseClick={() => setOrderCompletedModal(!orderCompletedModal)}
           isModalOpen={orderCompletedModal}
           title="Order has already completed"

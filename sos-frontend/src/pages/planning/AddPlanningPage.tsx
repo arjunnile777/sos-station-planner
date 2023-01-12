@@ -18,13 +18,18 @@ import SearchableSelectPage from '../../component/SeachableSelectPage';
 import {
   CustomerPartLinkageSliceSelector,
   getAllCustomers,
+  getAllLinkageCustomers,
+  getAllLinkagePartNumbers,
   getAllPartNumbers,
 } from '../../store/slices/customerPartLinkage.slice';
 import { getIndividualLinkageApi } from '../../services/CustomerPartLinkageApi';
 import { getIndividualCustomerMasterApi } from '../../services/CustomerMasterApi';
 import { getIndividualPartMasterApi } from '../../services/PartMasterApi';
 import { saveScannedDataApi } from '../../services/ClientApi';
-import { getLoginUserDetails } from '../../utils/localStorage';
+import {
+  getLoginUserDetails,
+  setDispatchEvent,
+} from '../../utils/localStorage';
 
 const PLANNING_STATUS = [
   {
@@ -55,14 +60,13 @@ const AddPlanningPage = ({
   onCloseModal,
 }: AddPlanningPageType) => {
   const dispatch = useDispatch();
-  const { customersDropdownData, partNumbersDropdownData } = useSelector(
-    CustomerPartLinkageSliceSelector,
-  );
+  const { linkageCustomersDropdownData, linkagePartNumbersDropdownData } =
+    useSelector(CustomerPartLinkageSliceSelector);
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [customersListData, setCustomersListData] = useState([]);
   const [partsListData, setPartsListData] = useState([]);
-  const [selectedCustomer, setSelectedCustomer] = useState('');
-  const [selectedPart, setSelectedPart] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState<any>('');
+  const [selectedPart, setSelectedPart] = useState<any>('');
   const [selectedCustomerError, setSelectedCustomerError] = useState('');
   const [selectedPartError, setSelectedPartError] = useState('');
   const [releaseQuantityValue, setReleaseQuantityValue] = useState('');
@@ -76,8 +80,7 @@ const AddPlanningPage = ({
   const [partData, setPartData] = useState<any>();
 
   useEffect(() => {
-    dispatch(getAllCustomers());
-    dispatch(getAllPartNumbers());
+    dispatch(getAllLinkageCustomers());
     if (updateModalData) {
       getIndividualLinkageData(updateModalData);
       getIndividualCustomerData(updateModalData);
@@ -87,35 +90,39 @@ const AddPlanningPage = ({
 
   useEffect(() => {
     let custs: any = [];
-    if (customersDropdownData.length > 0) {
-      custs = customersDropdownData.map((item: any) => ({
+    console.log(
+      'linkageCustomersDropdownDatalinkageCustomersDropdownData=',
+      linkageCustomersDropdownData,
+    );
+    if (linkageCustomersDropdownData.length > 0) {
+      custs = linkageCustomersDropdownData.map((item: any) => ({
         ...item,
-        value: item.id,
-        label: item.name,
+        value: item.customer_id,
+        label: item.customer_name,
       }));
     }
 
     setCustomersListData(custs);
-  }, [customersDropdownData]);
+  }, [linkageCustomersDropdownData]);
 
   useEffect(() => {
     let parts: any = [];
-    if (partNumbersDropdownData.length > 0) {
-      parts = partNumbersDropdownData.map((item: any) => ({
+    if (linkagePartNumbersDropdownData.length > 0) {
+      parts = linkagePartNumbersDropdownData.map((item: any) => ({
         ...item,
-        value: item.id,
+        value: item.part_id,
         label: item.part_no,
       }));
     }
 
     setPartsListData(parts);
-  }, [partNumbersDropdownData]);
+  }, [linkagePartNumbersDropdownData]);
 
   useEffect(() => {
-    console.log(isUpdateModal);
+    console.log(updateModalData);
     if (isUpdateModal && updateModalData) {
-      setSelectedCustomer(updateModalData.customer_id);
-      setSelectedPart(updateModalData.part_id);
+      setSelectedCustomer(parseInt(updateModalData.customer_id));
+      setSelectedPart(updateModalData.part_no);
       setReleaseQuantityValue(updateModalData.total_quantity);
       setPlanningStatus(updateModalData.status);
     }
@@ -198,7 +205,7 @@ const AddPlanningPage = ({
           });
           if (response && response.data) {
             const params: any = {
-              customer_name: custN[0].name,
+              customer_name: custN[0].customer_name,
               customer_id: selectedCustomer,
               part_no: partN[0].part_no,
               part_id: selectedPart,
@@ -258,6 +265,9 @@ const AddPlanningPage = ({
       if (response && response.status === 200 && response.data) {
         if (params.status === 2) {
           requestForCreateXml();
+        }
+        if (params.status === 2 || params.status === 1) {
+          setDispatchEvent();
         }
         handleSuccessResponse(response.data);
       } else {
@@ -373,6 +383,8 @@ const AddPlanningPage = ({
     setReleaseQuantityValueError('');
     setPlanningStatusError('');
     setSelectedPartDescription('');
+    setCustomersListData([]);
+    setPartsListData([]);
   };
 
   return (
@@ -395,7 +407,9 @@ const AddPlanningPage = ({
             error={selectedCustomerError}
             value={selectedCustomer}
             handleChange={(value: string) => {
+              console.log('Selected customer=', value);
               setSelectedCustomer(value);
+              dispatch(getAllLinkagePartNumbers({ customer_id: value }));
               // if (selectedPart && value) {
               //   getIndividualLinkageData({
               //     customer_id: value,
@@ -406,7 +420,11 @@ const AddPlanningPage = ({
             required
           />
           <SearchableSelectPage
-            disable={isUpdateModal ? true : false}
+            disable={
+              isUpdateModal || !selectedCustomer || partsListData.length === 0
+                ? true
+                : false
+            }
             optionsData={partsListData}
             label="Select Part"
             name="partNameValue"

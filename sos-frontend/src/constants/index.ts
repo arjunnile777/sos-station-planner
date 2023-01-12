@@ -3,6 +3,7 @@ export const LOGIN_ROLE = 'sos-login-role';
 export const OPERATOR_LOGIN_ROLE = '1';
 export const SUPERVISOR_LOGIN_ROLE = '2';
 export const LOGIN_USER_DETAILS = 'login_user_details';
+export const ORDER_STATUS_CHANGE = 'order_status_change';
 
 // Routing constants.
 export const LOGIN_ROUTE = 'login';

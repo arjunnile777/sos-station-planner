@@ -19,6 +19,12 @@ export const getIndividualLinkageApi = (payload: any) =>
     `/customer-part/getIndividualLinkage/${payload.customer_id}/${payload.part_id}`,
   );
 
+export const getLinkageCustomersApi = () =>
+  http.get(`/customer-part/getLinkageCustomersList`);
+
+export const getLinkagePartsApi = (payload: any) =>
+  http.get(`/customer-part/getLinkagePartsList/${payload.customer_id}`);
+
 export const addCustomerPartLinkageiApi = (
   payload: CreateCustomerPartLinkageType,
 ) => http.post(`/customer-part/create`, payload);

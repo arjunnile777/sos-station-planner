@@ -42,13 +42,13 @@ const PageHeaderPage = ({
           <Button type="primary" ghost onClick={onClientBtnClick}>
             Reset
           </Button>
-          <Button
+          {/* <Button
             type="primary"
             onClick={onClientPrintClick}
             style={{ marginLeft: '20px' }}
           >
             Print
-          </Button>
+          </Button> */}
         </Col>
       )}
     </Row>

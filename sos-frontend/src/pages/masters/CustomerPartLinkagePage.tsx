@@ -166,12 +166,12 @@ const CustomerPartLinkagePage = () => {
   });
 
   const columns: ColumnsType<CustomerPartLinkagePageType> = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      align: 'center',
-    },
+    // {
+    //   title: 'ID',
+    //   dataIndex: 'id',
+    //   key: 'id',
+    //   align: 'center',
+    // },
     {
       title: 'Customer Name',
       dataIndex: 'customer_name',
